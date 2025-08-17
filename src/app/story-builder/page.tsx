@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -15,8 +18,35 @@ import {
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Save } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function StoryBuilderPage() {
+  const { toast } = useToast();
+  const [personalStory, setPersonalStory] = useState('');
+  const [ecs, setEcs] = useState('');
+  const [achievements, setAchievements] = useState('');
+  const [grades, setGrades] = useState('');
+  const [struggles, setStruggles] = useState('');
+  const [skills, setSkills] = useState('');
+
+  const handleSave = () => {
+    // In a real application, this would save the data to a database.
+    // For now, we'll just show a toast notification.
+    const narrative = {
+      personalStory,
+      ecs,
+      achievements,
+      grades,
+      struggles,
+      skills,
+    };
+    console.log('Saved Narrative:', narrative);
+    toast({
+      title: 'Narrative Saved',
+      description: 'Your story has been successfully saved.',
+    });
+  };
+
   return (
     <div className="space-y-6">
       <header className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
@@ -27,7 +57,7 @@ export default function StoryBuilderPage() {
             Essay Tool to help you write compelling essays.
           </p>
         </div>
-        <Button className="shrink-0">
+        <Button className="shrink-0" onClick={handleSave}>
           <Save className="mr-2 h-4 w-4" />
           Save Narrative
         </Button>
@@ -42,7 +72,12 @@ export default function StoryBuilderPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Textarea placeholder="Tell your story..." rows={10} />
+          <Textarea
+            placeholder="Tell your story..."
+            rows={10}
+            value={personalStory}
+            onChange={(e) => setPersonalStory(e.target.value)}
+          />
         </CardContent>
       </Card>
 
@@ -61,6 +96,8 @@ export default function StoryBuilderPage() {
               className="mt-2"
               placeholder="e.g., President of DECA Club, organized a charity event..."
               rows={5}
+              value={ecs}
+              onChange={(e) => setEcs(e.target.value)}
             />
           </AccordionContent>
         </AccordionItem>
@@ -77,6 +114,8 @@ export default function StoryBuilderPage() {
               className="mt-2"
               placeholder="e.g., Won 1st place at the National Science Fair..."
               rows={5}
+              value={achievements}
+              onChange={(e) => setAchievements(e.target.value)}
             />
           </AccordionContent>
         </AccordionItem>
@@ -94,6 +133,8 @@ export default function StoryBuilderPage() {
               className="mt-2"
               placeholder="e.g., Maintained a 95% average, excelled in Advanced Functions..."
               rows={5}
+              value={grades}
+              onChange={(e) => setGrades(e.target.value)}
             />
           </AccordionContent>
         </AccordionItem>
@@ -111,6 +152,8 @@ export default function StoryBuilderPage() {
               className="mt-2"
               placeholder="e.g., Overcame public speaking anxiety through debate club..."
               rows={5}
+              value={struggles}
+              onChange={(e) => setStruggles(e.target.value)}
             />
           </AccordionContent>
         </AccordionItem>
@@ -127,6 +170,8 @@ export default function StoryBuilderPage() {
               className="mt-2"
               placeholder="e.g., Proficient in Python, strong leadership and communication skills..."
               rows={5}
+              value={skills}
+              onChange={(e) => setSkills(e.target.value)}
             />
           </AccordionContent>
         </AccordionItem>
