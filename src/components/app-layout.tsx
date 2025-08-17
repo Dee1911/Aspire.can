@@ -22,10 +22,14 @@ import {
   Calendar,
   Sparkles,
   BookOpen,
+  Target,
+  FileClock,
 } from 'lucide-react';
 
 const navItems = [
   { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/program-finder', icon: Target, label: 'AI Program Finder' },
+  { href: '/timeline-generator', icon: FileClock, label: 'Timeline Generator' },
   { href: '/programs', icon: GraduationCap, label: 'Program Explorer' },
   { href: '/scholarships', icon: DollarSign, label: 'Scholarships' },
   { href: '/extracurriculars', icon: Lightbulb, label: 'Extracurriculars' },
