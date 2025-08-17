@@ -1,5 +1,3 @@
-// This file is machine-generated - edit at your own risk!
-
 'use server';
 
 /**
@@ -14,6 +12,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const AnalyzeEssayInputSchema = z.object({
+  essayPrompt: z.string().optional().describe('The essay prompt the user is responding to.'),
   essayDraft: z.string().describe('The essay draft to be analyzed.'),
   storyBuilderContext: z
     .string()
@@ -41,7 +40,14 @@ const prompt = ai.definePrompt({
   output: {schema: AnalyzeEssayOutputSchema},
   prompt: `You are an AI essay feedback tool that analyzes essay drafts and provides feedback to students.
 
-  Analyze the essay draft below, considering the context from the Story Builder, and provide feedback on its strengths, weaknesses, and suggestions for improvement.
+  Analyze the essay draft below, considering the essay prompt and the context from the Story Builder. Provide feedback on its strengths, weaknesses, and suggestions for improvement.
+
+  Essay Prompt:
+  {{#if essayPrompt}}
+  {{{essayPrompt}}}
+  {{else}}
+  None provided.
+  {{/if}}
 
   Story Builder Context:
   {{#if storyBuilderContext}}

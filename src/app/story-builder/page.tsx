@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -28,11 +28,25 @@ export default function StoryBuilderPage() {
   const [grades, setGrades] = useState('');
   const [struggles, setStruggles] = useState('');
   const [skills, setSkills] = useState('');
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    // Load saved data from localStorage when the component mounts
+    const savedData = localStorage.getItem('storyBuilderData');
+    if (savedData) {
+      const data = JSON.parse(savedData);
+      setPersonalStory(data.personalStory || '');
+      setEcs(data.ecs || '');
+      setAchievements(data.achievements || '');
+      setGrades(data.grades || '');
+      setStruggles(data.struggles || '');
+      setSkills(data.skills || '');
+    }
+    setIsLoaded(true);
+  }, []);
 
   const handleSave = () => {
-    // In a real application, this would save the data to a database.
-    // For now, we'll just show a toast notification.
-    const narrative = {
+    const narrativeData = {
       personalStory,
       ecs,
       achievements,
@@ -40,12 +54,31 @@ export default function StoryBuilderPage() {
       struggles,
       skills,
     };
-    console.log('Saved Narrative:', narrative);
+    
+    // Save all fields to a single JSON object in localStorage
+    localStorage.setItem('storyBuilderData', JSON.stringify(narrativeData));
+
+    // Create a combined string for the essay tool
+    const combinedNarrative = [
+      `Personal Story: ${personalStory}`,
+      `Extracurriculars: ${ecs}`,
+      `Achievements: ${achievements}`,
+      `Grades: ${grades}`,
+      `Struggles & Growth: ${struggles}`,
+      `Skills: ${skills}`
+    ].join('\n\n');
+
+    localStorage.setItem('storyBuilderNarrative', combinedNarrative);
+
     toast({
       title: 'Narrative Saved',
-      description: 'Your story has been successfully saved.',
+      description: 'Your story has been successfully saved to your browser.',
     });
   };
+
+  if (!isLoaded) {
+      return null; // or a loading spinner
+  }
 
   return (
     <div className="space-y-6">
@@ -81,7 +114,7 @@ export default function StoryBuilderPage() {
         </CardContent>
       </Card>
 
-      <Accordion type="multiple" className="w-full space-y-4">
+      <Accordion type="multiple" className="w-full space-y-4" defaultValue={['item-1']}>
         <AccordionItem value="item-1" className="border rounded-lg bg-card">
           <AccordionTrigger className="p-4 font-semibold hover:no-underline">
             Extracurriculars & Experiences

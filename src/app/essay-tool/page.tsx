@@ -11,12 +11,14 @@ import {
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Wand2, BrainCircuit, Loader2, Sparkles, ThumbsUp, ThumbsDown, Lightbulb } from 'lucide-react';
+import { Wand2, BrainCircuit, Loader2, Sparkles, ThumbsUp, ThumbsDown, Lightbulb, Download } from 'lucide-react';
 import { analyzeEssay, AnalyzeEssayOutput } from '@/ai/flows/essay-feedback';
 import { improveEssay } from '@/ai/flows/improve-essay';
 import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
 
 export default function EssayToolPage() {
+  const [essayPrompt, setEssayPrompt] = useState('');
   const [essayDraft, setEssayDraft] = useState('');
   const [storyContext, setStoryContext] = useState('');
   const [feedback, setFeedback] = useState<AnalyzeEssayOutput | null>(null);
@@ -39,6 +41,7 @@ export default function EssayToolPage() {
     setImprovedEssay(null);
     try {
       const result = await analyzeEssay({
+        essayPrompt,
         essayDraft,
         storyBuilderContext: storyContext,
       });
@@ -56,11 +59,20 @@ export default function EssayToolPage() {
   };
 
   const handleImprove = async () => {
-    if (!essayDraft || !storyContext) {
-      toast({
-        title: 'Draft and Context Required',
+    if (!essayDraft) {
+       toast({
+        title: 'Essay Draft Required',
         description:
-          'Please provide both an essay draft and your story context to generate an improved version.',
+          'Please provide an essay draft to generate an improved version.',
+        variant: 'destructive',
+      });
+      return;
+    }
+     if (!storyContext) {
+      toast({
+        title: 'Story Context Required',
+        description:
+          'Please load your story context to generate a personalized, improved version.',
         variant: 'destructive',
       });
       return;
@@ -70,6 +82,7 @@ export default function EssayToolPage() {
     setImprovedEssay(null);
     try {
       const result = await improveEssay({
+        essayPrompt,
         essayDraft,
         storyBuilderNarrative: storyContext,
       });
@@ -83,6 +96,23 @@ export default function EssayToolPage() {
       });
     } finally {
       setIsImproving(false);
+    }
+  };
+  
+  const handleLoadNarrative = () => {
+    const savedNarrative = localStorage.getItem('storyBuilderNarrative');
+    if (savedNarrative) {
+      setStoryContext(savedNarrative);
+      toast({
+        title: 'Narrative Loaded',
+        description: 'Your story has been loaded from the Story Builder.',
+      });
+    } else {
+      toast({
+        title: 'No Narrative Found',
+        description: 'Please save your story in the Story Builder first.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -110,6 +140,15 @@ export default function EssayToolPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
+                <Label htmlFor="essay-prompt">Essay Prompt (Optional)</Label>
+                <Input
+                  id="essay-prompt"
+                  placeholder="Paste the essay prompt here..."
+                  value={essayPrompt}
+                  onChange={e => setEssayPrompt(e.target.value)}
+                />
+              </div>
+              <div>
                 <Label htmlFor="essay-draft">Essay Draft</Label>
                 <Textarea
                   id="essay-draft"
@@ -120,10 +159,16 @@ export default function EssayToolPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="story-context">Story Builder Narrative</Label>
+                <div className="flex justify-between items-center mb-2">
+                  <Label htmlFor="story-context">Story Builder Narrative</Label>
+                  <Button variant="outline" size="sm" onClick={handleLoadNarrative}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Load from Story Builder
+                  </Button>
+                </div>
                 <Textarea
                   id="story-context"
-                  placeholder="Paste your narrative from the Story Builder here for better results..."
+                  placeholder="Load your narrative from the Story Builder or paste it here..."
                   rows={8}
                   value={storyContext}
                   onChange={e => setStoryContext(e.target.value)}
@@ -160,25 +205,18 @@ export default function EssayToolPage() {
         </div>
 
         <div className="space-y-6">
-          {isAnalyzing && (
+          {(isAnalyzing || isImproving) && (
             <Card className="flex items-center justify-center h-full min-h-[300px]">
               <div className="text-center text-muted-foreground p-8">
                 <Loader2 className="mx-auto h-12 w-12 animate-spin" />
-                <p className="mt-4">Analyzing your essay...</p>
-              </div>
-            </Card>
-          )}
-
-          {isImproving && (
-            <Card className="flex items-center justify-center h-full min-h-[300px]">
-              <div className="text-center text-muted-foreground p-8">
-                <Loader2 className="mx-auto h-12 w-12 animate-spin" />
-                <p className="mt-4">Improving your essay...</p>
+                <p className="mt-4">
+                  {isAnalyzing ? 'Analyzing your essay...' : 'Improving your essay...'}
+                </p>
               </div>
             </Card>
           )}
           
-          {feedback && (
+          {feedback && !isAnalyzing && (
             <Card>
               <CardHeader>
                 <CardTitle>Essay Feedback</CardTitle>
@@ -203,7 +241,7 @@ export default function EssayToolPage() {
             </Card>
           )}
 
-          {improvedEssay && (
+          {improvedEssay && !isImproving &&(
             <Card>
               <CardHeader>
                 <CardTitle>Improved Essay</CardTitle>

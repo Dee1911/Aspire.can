@@ -11,6 +11,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const ImproveEssayInputSchema = z.object({
+  essayPrompt: z.string().optional().describe('The essay prompt the user is responding to.'),
   essayDraft: z.string().describe('The current draft of the essay.'),
   storyBuilderNarrative: z.string().describe('The narrative composed in the Story Builder, including ECs, achievements, grades, struggles, skills, and personal story.'),
 });
@@ -29,7 +30,14 @@ const prompt = ai.definePrompt({
   name: 'improveEssayPrompt',
   input: {schema: ImproveEssayInputSchema},
   output: {schema: ImproveEssayOutputSchema},
-  prompt: `You are an AI essay writing assistant. You will be provided with an essay draft and a narrative from the Story Builder. Your task is to improve the essay draft, making it more compelling and personalized based on the information in the narrative. Pay close attention to the student's ECs, achievements, grades, struggles, skills, and personal story to create an improved essay.
+  prompt: `You are an AI essay writing assistant. You will be provided with an essay draft, an optional essay prompt, and a narrative from the Story Builder. Your task is to improve the essay draft, making it more compelling and personalized based on the information in the narrative, while ensuring it directly answers the prompt if provided. Pay close attention to the student's ECs, achievements, grades, struggles, skills, and personal story to create an improved essay.
+
+Essay Prompt:
+{{#if essayPrompt}}
+{{{essayPrompt}}}
+{{else}}
+None provided.
+{{/if}}
 
 Essay Draft: {{{essayDraft}}}
 
