@@ -1,3 +1,6 @@
+
+'use client';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,60 +32,88 @@ import {
   Target,
   Rocket,
   Shield,
+  FileClock,
+  Calculator,
 } from 'lucide-react';
 import type { VariantProps } from 'class-variance-authority';
-import { badgeVariants } from '@/components/ui/badge';
 import Link from 'next/link';
+import { useState } from 'react';
 
-const applications = [
+type ApplicationType = 'Reach' | 'Target' | 'Safety';
+type ApplicationProgress =
+  | 'Not Started'
+  | 'In Progress'
+  | 'Applied'
+  | 'Completed';
+
+interface Application {
+  id: number;
+  name: string;
+  deadline: string;
+  type: ApplicationType;
+  progress: ApplicationProgress;
+}
+
+const initialApplications: Application[] = [
   {
+    id: 1,
     name: 'University of Toronto - Commerce (Rotman)',
-    deadline: '2025-11-03',
+    deadline: '2025-01-15',
     type: 'Target',
     progress: 'Not Started',
   },
   {
-    name: 'McGill University - Commerce',
-    deadline: '2025-11-03',
-    type: 'Target',
-    progress: 'Not Started',
-  },
-  {
-    name: 'University of Waterloo - Accounting and Financial Management',
-    deadline: '2025-11-03',
-    type: 'Target',
+    id: 2,
+    name: 'University of Waterloo - Software Engineering',
+    deadline: '2025-02-01',
+    type: 'Reach',
     progress: 'In Progress',
   },
   {
+    id: 3,
     name: "Queen's University - Commerce",
-    deadline: '2025-11-03',
-    type: 'Safety',
+    deadline: '2025-02-15',
+    type: 'Target',
     progress: 'Applied',
   },
   {
-    name: 'Stanford University - Computer Science',
-    deadline: '2025-10-15',
-    type: 'Reach',
+    id: 4,
+    name: 'Western University - Business (Ivey AEO)',
+    deadline: '2025-01-15',
+    type: 'Target',
     progress: 'Completed',
+  },
+  {
+    id: 5,
+    name: 'York University - Business Administration',
+    deadline: '2025-03-01',
+    type: 'Safety',
+    progress: 'Not Started',
   },
 ];
 
-type Application = (typeof applications)[0];
-
-const progressVariantMap: Record<
-  string,
-  VariantProps<typeof badgeVariants>['variant']
-> = {
-  'Not Started': 'destructive',
-  'In Progress': 'secondary',
-  Applied: 'default',
-  Completed: 'outline',
-};
-
 const shortcutCards = [
   {
+    title: 'AI Program Finder',
+    description: 'Discover your best-fit universities.',
+    href: '/program-finder',
+    icon: Target,
+  },
+  {
+    title: 'AI Admission Calculator',
+    description: 'Estimate your admission chances.',
+    href: '/admission-calculator',
+    icon: Calculator,
+  },
+  {
+    title: 'AI Timeline Generator',
+    description: 'Generate your application plan.',
+    href: '/timeline-generator',
+    icon: FileClock,
+  },
+  {
     title: 'Program Explorer',
-    description: 'Find your best-fit universities.',
+    description: 'Browse university programs.',
     href: '/programs',
     icon: GraduationCap,
   },
@@ -118,31 +149,82 @@ const shortcutCards = [
   },
 ];
 
-function ApplicationRow({ application }: { application: Application }) {
+const typeIcons: Record<ApplicationType, React.ElementType> = {
+  Reach: Rocket,
+  Target: Target,
+  Safety: Shield,
+};
+
+const typeColors: Record<ApplicationType, string> = {
+  Reach: 'text-red-500',
+  Target: 'text-blue-500',
+  Safety: 'text-green-500',
+};
+
+function ApplicationRow({
+  application,
+  onUpdate,
+}: {
+  application: Application;
+  onUpdate: (id: number, field: keyof Application, value: any) => void;
+}) {
+  const Icon = typeIcons[application.type];
+  const color = typeColors[application.type];
+
   return (
     <TableRow>
       <TableCell className="font-medium">{application.name}</TableCell>
       <TableCell>
         <Input
           type="date"
-          defaultValue={application.deadline}
+          value={application.deadline}
+          onChange={e =>
+            onUpdate(application.id, 'deadline', e.target.value)
+          }
           className="max-w-[150px]"
         />
       </TableCell>
       <TableCell>
-        <Select defaultValue={application.type}>
+        <Select
+          value={application.type}
+          onValueChange={(value: ApplicationType) =>
+            onUpdate(application.id, 'type', value)
+          }
+        >
           <SelectTrigger className="w-[120px]">
-            <SelectValue placeholder="Type" />
+            <SelectValue>
+              <span className="flex items-center gap-2">
+                <Icon className={`w-4 h-4 ${color}`} />
+                {application.type}
+              </span>
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Safety">Safety</SelectItem>
-            <SelectItem value="Target">Target</SelectItem>
-            <SelectItem value="Reach">Reach</SelectItem>
+            <SelectItem value="Safety">
+              <span className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-green-500" /> Safety
+              </span>
+            </SelectItem>
+            <SelectItem value="Target">
+              <span className="flex items-center gap-2">
+                <Target className="w-4 h-4 text-blue-500" /> Target
+              </span>
+            </SelectItem>
+            <SelectItem value="Reach">
+              <span className="flex items-center gap-2">
+                <Rocket className="w-4 h-4 text-red-500" /> Reach
+              </span>
+            </SelectItem>
           </SelectContent>
         </Select>
       </TableCell>
       <TableCell>
-        <Select defaultValue={application.progress}>
+        <Select
+          value={application.progress}
+          onValueChange={(value: ApplicationProgress) =>
+            onUpdate(application.id, 'progress', value)
+          }
+        >
           <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="Progress" />
           </SelectTrigger>
@@ -159,14 +241,44 @@ function ApplicationRow({ application }: { application: Application }) {
 }
 
 export default function DashboardPage() {
+  const [applications, setApplications] =
+    useState<Application[]>(initialApplications);
+  const [newCollegeName, setNewCollegeName] = useState('');
+
+  const handleUpdate = (
+    id: number,
+    field: keyof Application,
+    value: any
+  ) => {
+    setApplications(
+      applications.map(app =>
+        app.id === id ? { ...app, [field]: value } : app
+      )
+    );
+  };
+
+  const handleAddCollege = () => {
+    if (newCollegeName.trim()) {
+      const newApp: Application = {
+        id: Date.now(),
+        name: newCollegeName.trim(),
+        deadline: new Date().toISOString().split('T')[0], // Default to today
+        type: 'Target',
+        progress: 'Not Started',
+      };
+      setApplications([newApp, ...applications]);
+      setNewCollegeName('');
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-headline font-bold">
-          My Application Tracker
+          My Application Dashboard
         </h1>
         <p className="text-muted-foreground">
-          Manage your university applications from a single dashboard.
+          Manage your university applications from a single command center.
         </p>
       </div>
 
@@ -174,20 +286,17 @@ export default function DashboardPage() {
         {shortcutCards.map(card => (
           <Card
             key={card.title}
-            className="hover:bg-card/90 transition-colors"
+            className="hover:border-primary/50 transition-colors"
           >
-            <Link href={card.href} className="block h-full">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-lg font-semibold">
-                  {card.title}
-                </CardTitle>
-                <card.icon className="h-6 w-6 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  {card.description}
-                </p>
-              </CardContent>
+            <Link href={card.href} className="block h-full p-6">
+              <div className="flex items-center justify-between">
+                <card.icon className="h-8 w-8 text-primary" />
+                <ArrowRight className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold mt-4">{card.title}</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                {card.description}
+              </p>
             </Link>
           </Card>
         ))}
@@ -196,14 +305,17 @@ export default function DashboardPage() {
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row gap-4 justify-between sm:items-center">
-            <CardTitle>Your Applications</CardTitle>
+            <CardTitle>Your Application Tracker</CardTitle>
             <div className="flex gap-2">
               <Input
                 placeholder="Enter a new college name..."
                 className="w-full sm:w-auto"
+                value={newCollegeName}
+                onChange={e => setNewCollegeName(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleAddCollege()}
               />
-              <Button>
-                <PlusCircle className="mr-2 h-4 w-4" /> Add College
+              <Button onClick={handleAddCollege}>
+                <PlusCircle className="mr-2 h-4 w-4" /> Add Application
               </Button>
             </div>
           </div>
@@ -220,7 +332,11 @@ export default function DashboardPage() {
             </TableHeader>
             <TableBody>
               {applications.map(app => (
-                <ApplicationRow key={app.name} application={app} />
+                <ApplicationRow
+                  key={app.id}
+                  application={app}
+                  onUpdate={handleUpdate}
+                />
               ))}
             </TableBody>
           </Table>
