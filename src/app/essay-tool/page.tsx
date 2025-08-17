@@ -1,0 +1,214 @@
+'use client';
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Wand2, BrainCircuit, Loader2, Sparkles } from 'lucide-react';
+import { analyzeEssay, AnalyzeEssayOutput } from '@/ai/flows/essay-feedback';
+import { improveEssay } from '@/ai/flows/improve-essay';
+import { useToast } from '@/hooks/use-toast';
+
+export default function EssayToolPage() {
+  const [essayDraft, setEssayDraft] = useState('');
+  const [storyContext, setStoryContext] = useState('');
+  const [feedback, setFeedback] = useState<AnalyzeEssayOutput | null>(null);
+  const [improvedEssay, setImprovedEssay] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isImproving, setIsImproving] = useState(false);
+  const { toast } = useToast();
+
+  const handleAnalyze = async () => {
+    if (!essayDraft) {
+      toast({
+        title: 'Essay Draft Required',
+        description: 'Please enter your essay draft to get feedback.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setIsAnalyzing(true);
+    setFeedback(null);
+    setImprovedEssay(null);
+    try {
+      const result = await analyzeEssay({
+        essayDraft,
+        storyBuilderContext: storyContext,
+      });
+      setFeedback(result);
+    } catch (error) {
+      console.error('Error analyzing essay:', error);
+      toast({
+        title: 'Analysis Failed',
+        description: 'Could not get feedback. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleImprove = async () => {
+    if (!essayDraft || !storyContext) {
+      toast({
+        title: 'Draft and Context Required',
+        description:
+          'Please provide both an essay draft and your story context to generate an improved version.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setIsImproving(true);
+    setFeedback(null);
+    setImprovedEssay(null);
+    try {
+      const result = await improveEssay({
+        essayDraft,
+        storyBuilderNarrative: storyContext,
+      });
+      setImprovedEssay(result.improvedEssay);
+    } catch (error) {
+      console.error('Error improving essay:', error);
+      toast({
+        title: 'Improvement Failed',
+        description: 'Could not improve the essay. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsImproving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <header>
+        <h1 className="text-3xl font-headline font-bold">AI Essay Tool</h1>
+        <p className="text-muted-foreground">
+          Get feedback on your essay and generate improved versions using AI.
+        </p>
+      </header>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Your Essay</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="essay-draft">Essay Draft</Label>
+                <Textarea
+                  id="essay-draft"
+                  placeholder="Paste your essay draft here..."
+                  rows={12}
+                  value={essayDraft}
+                  onChange={e => setEssayDraft(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="story-context">Story Builder Narrative</Label>
+                <Textarea
+                  id="story-context"
+                  placeholder="Paste your narrative from the Story Builder here for better results..."
+                  rows={8}
+                  value={storyContext}
+                  onChange={e => setStoryContext(e.target.value)}
+                />
+              </div>
+            </CardContent>
+          </Card>
+          <div className="flex gap-4">
+            <Button
+              onClick={handleAnalyze}
+              disabled={isAnalyzing || isImproving}
+              className="w-full"
+            >
+              {isAnalyzing ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <BrainCircuit className="mr-2 h-4 w-4" />
+              )}
+              Get Feedback
+            </Button>
+            <Button
+              onClick={handleImprove}
+              disabled={isAnalyzing || isImproving}
+              className="w-full"
+            >
+              {isImproving ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Wand2 className="mr-2 h-4 w-4" />
+              )}
+              Improve Essay
+            </Button>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          {feedback && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Essay Feedback</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h3 className="font-semibold text-lg">Strengths</h3>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                    {feedback.strengths}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">Weaknesses</h3>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                    {feedback.weaknesses}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">Suggestions</h3>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                    {feedback.suggestions}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {improvedEssay && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Improved Essay</CardTitle>
+                <CardDescription>
+                  Here's an AI-generated version of your essay.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                  {improvedEssay}
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {!isAnalyzing && !isImproving && !feedback && !improvedEssay && (
+            <Card className="flex items-center justify-center h-full min-h-[300px] lg:min-h-full">
+              <div className="text-center text-muted-foreground p-8">
+                <Sparkles className="mx-auto h-12 w-12" />
+                <p className="mt-4">
+                  Your AI feedback and improvements will appear here.
+                </p>
+              </div>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
