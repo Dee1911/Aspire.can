@@ -25,6 +25,7 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   findPrograms,
   FindProgramsOutput,
+  ProgramSuggestion,
 } from '@/ai/flows/program-finder-flow';
 import { useState } from 'react';
 import { Loader2, Rocket, Shield, Sparkles, Target } from 'lucide-react';
@@ -46,6 +47,40 @@ const formSchema = z.object({
     .string()
     .min(1, 'Please list your extracurriculars.'),
 });
+
+function ProgramCard({
+  program,
+  index,
+  type,
+}: {
+  program: ProgramSuggestion;
+  index: number;
+  type: 'reach' | 'target' | 'safety';
+}) {
+  return (
+    <AccordionItem
+      value={`${type}-${index}`}
+      className="border-none"
+    >
+      <Card className="bg-card/50">
+        <AccordionTrigger className="p-4 font-semibold hover:no-underline text-left">
+          {program.programName} - {program.universityName}
+        </AccordionTrigger>
+        <AccordionContent className="p-4 pt-0 space-y-3">
+          <p className="text-muted-foreground">{program.justification}</p>
+          <p>
+            <strong className="text-foreground">Requirements:</strong>{' '}
+            {program.admissionRequirements}
+          </p>
+          <p>
+            <strong className="text-foreground">Career Paths:</strong>{' '}
+            {program.careerPaths}
+          </p>
+        </AccordionContent>
+      </Card>
+    </AccordionItem>
+  );
+}
 
 export default function ProgramFinderPage() {
   const [recommendations, setRecommendations] =
@@ -221,58 +256,58 @@ export default function ProgramFinderPage() {
                 <div className="space-y-6">
                   <div>
                     <h3 className="flex items-center font-bold text-xl mb-3">
-                      <Rocket className="w-6 h-6 mr-2 text-primary" /> Reach
+                      <Rocket className="w-6 h-6 mr-2 text-red-500" /> Reach
                     </h3>
-                    <Accordion type="single" collapsible className="w-full space-y-2">
+                    <Accordion
+                      type="single"
+                      collapsible
+                      className="w-full space-y-2"
+                    >
                       {recommendations.reach.map((program, i) => (
-                        <AccordionItem value={`reach-${i}`} key={`reach-${i}`} className='bg-card border rounded-lg'>
-                          <AccordionTrigger className='p-4 font-semibold hover:no-underline'>
-                            {program.programName} - {program.universityName}
-                          </AccordionTrigger>
-                          <AccordionContent className='p-4 pt-0 space-y-3'>
-                            <p className="text-muted-foreground">{program.justification}</p>
-                            <p><strong className="text-foreground">Requirements:</strong> {program.admissionRequirements}</p>
-                            <p><strong className="text-foreground">Career Paths:</strong> {program.careerPaths}</p>
-                          </AccordionContent>
-                        </AccordionItem>
+                        <ProgramCard
+                          program={program}
+                          index={i}
+                          key={`reach-${i}`}
+                          type="reach"
+                        />
                       ))}
                     </Accordion>
                   </div>
-                   <div>
+                  <div>
                     <h3 className="flex items-center font-bold text-xl mb-3">
-                      <Target className="w-6 h-6 mr-2 text-primary" /> Target
+                      <Target className="w-6 h-6 mr-2 text-blue-500" /> Target
                     </h3>
-                    <Accordion type="single" collapsible className="w-full space-y-2">
+                    <Accordion
+                      type="single"
+                      collapsible
+                      className="w-full space-y-2"
+                    >
                       {recommendations.target.map((program, i) => (
-                        <AccordionItem value={`target-${i}`} key={`target-${i}`} className='bg-card border rounded-lg'>
-                          <AccordionTrigger className='p-4 font-semibold hover:no-underline'>
-                            {program.programName} - {program.universityName}
-                          </AccordionTrigger>
-                          <AccordionContent className='p-4 pt-0 space-y-3'>
-                            <p className="text-muted-foreground">{program.justification}</p>
-                            <p><strong className="text-foreground">Requirements:</strong> {program.admissionRequirements}</p>
-                            <p><strong className="text-foreground">Career Paths:</strong> {program.careerPaths}</p>
-                          </AccordionContent>
-                        </AccordionItem>
+                        <ProgramCard
+                          program={program}
+                          index={i}
+                          key={`target-${i}`}
+                          type="target"
+                        />
                       ))}
                     </Accordion>
                   </div>
-                   <div>
+                  <div>
                     <h3 className="flex items-center font-bold text-xl mb-3">
-                      <Shield className="w-6 h-6 mr-2 text-primary" /> Safety
+                      <Shield className="w-6 h-6 mr-2 text-green-500" /> Safety
                     </h3>
-                    <Accordion type="single" collapsible className="w-full space-y-2">
+                    <Accordion
+                      type="single"
+                      collapsible
+                      className="w-full space-y-2"
+                    >
                       {recommendations.safety.map((program, i) => (
-                        <AccordionItem value={`safety-${i}`} key={`safety-${i}`} className='bg-card border rounded-lg'>
-                          <AccordionTrigger className='p-4 font-semibold hover:no-underline'>
-                             {program.programName} - {program.universityName}
-                          </AccordionTrigger>
-                           <AccordionContent className='p-4 pt-0 space-y-3'>
-                            <p className="text-muted-foreground">{program.justification}</p>
-                            <p><strong className="text-foreground">Requirements:</strong> {program.admissionRequirements}</p>
-                            <p><strong className="text-foreground">Career Paths:</strong> {program.careerPaths}</p>
-                          </AccordionContent>
-                        </AccordionItem>
+                        <ProgramCard
+                          program={program}
+                          index={i}
+                          key={`safety-${i}`}
+                          type="safety"
+                        />
                       ))}
                     </Accordion>
                   </div>

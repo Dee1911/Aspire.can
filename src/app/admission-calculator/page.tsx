@@ -34,7 +34,7 @@ import {
   CalculateAdmissionChanceOutput,
 } from '@/ai/flows/admission-calculator-flow';
 import { useState } from 'react';
-import { Calculator, Loader2, Sparkles } from 'lucide-react';
+import { Calculator, Loader2, Sparkles, ThumbsDown, ThumbsUp, TrendingUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
 
@@ -50,6 +50,16 @@ const formSchema = z.object({
     .min(1, 'Please enter your target university.'),
   targetProgram: z.string().min(1, 'Please enter your target program.'),
 });
+
+const AnalysisSection = ({ title, content, icon, colorClass }: { title: string, content: string, icon: React.ReactNode, colorClass: string }) => (
+  <div>
+    <h3 className={`font-bold text-lg mb-2 flex items-center ${colorClass}`}>
+      {icon}
+      {title}
+    </h3>
+    <p className="text-muted-foreground text-sm">{content}</p>
+  </div>
+);
 
 export default function AdmissionCalculatorPage() {
   const [result, setResult] = useState<CalculateAdmissionChanceOutput | null>(
@@ -87,6 +97,20 @@ export default function AdmissionCalculatorPage() {
       setIsLoading(false);
     }
   }
+
+  const analysisParts = result?.analysis.split('\n\n').reduce((acc, part) => {
+    if (part.startsWith('Strengths:')) {
+      acc.strengths = part.replace('Strengths:', '').trim();
+    } else if (part.startsWith('Weaknesses:')) {
+      acc.weaknesses = part.replace('Weaknesses:', '').trim();
+    } else if (part.startsWith('Suggestions for Improvement:')) {
+      acc.suggestions = part.replace('Suggestions for Improvement:', '').trim();
+    } else if (!acc.intro) {
+      acc.intro = part.trim();
+    }
+    return acc;
+  }, { intro: '', strengths: '', weaknesses: '', suggestions: '' }) || { intro: '', strengths: '', weaknesses: '', suggestions: '' };
+
 
   return (
     <div className="space-y-6">
@@ -267,14 +291,38 @@ export default function AdmissionCalculatorPage() {
                     <Progress
                       value={result.admissionChancePercentage}
                       className="mt-4 h-4"
+                      aria-label={`${result.admissionChancePercentage}% admission chance`}
                     />
                   </div>
-                  <div>
-                    <h3 className="font-bold text-xl mb-2">Expert Analysis</h3>
-                    <p className="text-muted-foreground whitespace-pre-wrap">
-                      {result.analysis}
-                    </p>
-                  </div>
+                   <Card className="bg-card/50">
+                    <CardContent className="p-6 space-y-4">
+                      {analysisParts.intro && <p className="text-muted-foreground">{analysisParts.intro}</p>}
+                      {analysisParts.strengths && (
+                        <AnalysisSection 
+                          title="Strengths"
+                          content={analysisParts.strengths}
+                          icon={<ThumbsUp className="w-5 h-5 mr-2" />}
+                          colorClass="text-green-500"
+                        />
+                      )}
+                      {analysisParts.weaknesses && (
+                        <AnalysisSection 
+                          title="Weaknesses"
+                          content={analysisParts.weaknesses}
+                          icon={<ThumbsDown className="w-5 h-5 mr-2" />}
+                          colorClass="text-red-500"
+                        />
+                      )}
+                       {analysisParts.suggestions && (
+                        <AnalysisSection 
+                          title="Suggestions for Improvement"
+                          content={analysisParts.suggestions}
+                          icon={<TrendingUp className="w-5 h-5 mr-2" />}
+                          colorClass="text-blue-500"
+                        />
+                      )}
+                    </CardContent>
+                  </Card>
                 </div>
               )}
             </CardContent>

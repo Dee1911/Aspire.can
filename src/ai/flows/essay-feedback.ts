@@ -25,9 +25,9 @@ const AnalyzeEssayInputSchema = z.object({
 export type AnalyzeEssayInput = z.infer<typeof AnalyzeEssayInputSchema>;
 
 const AnalyzeEssayOutputSchema = z.object({
-  strengths: z.string().describe('The strengths of the essay.'),
-  weaknesses: z.string().describe('The weaknesses of the essay.'),
-  suggestions: z.string().describe('Suggestions for improving the essay.'),
+  strengths: z.string().describe('The strengths of the essay, formatted as a bulleted list starting each point with *'),
+  weaknesses: z.string().describe('The weaknesses of the essay, formatted as a bulleted list starting each point with *'),
+  suggestions: z.string().describe('Suggestions for improving the essay, formatted as a bulleted list starting each point with *'),
 });
 export type AnalyzeEssayOutput = z.infer<typeof AnalyzeEssayOutputSchema>;
 
@@ -53,10 +53,10 @@ const prompt = ai.definePrompt({
   Essay Draft:
   {{{essayDraft}}}
 
-  Provide your analysis in the following format:
-  Strengths: [List the strengths of the essay]
-  Weaknesses: [List the weaknesses of the essay]
-  Suggestions: [List suggestions for improving the essay]`,
+  Provide your analysis in the following format. Each point within a category must start with a '* '.
+  Strengths: [Bulleted list of strengths]
+  Weaknesses: [Bulleted list of weaknesses]
+  Suggestions: [Bulleted list of suggestions]`,
 });
 
 const analyzeEssayFlow = ai.defineFlow(

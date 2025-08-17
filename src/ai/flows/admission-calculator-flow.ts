@@ -45,7 +45,7 @@ const CalculateAdmissionChanceOutputSchema = z.object({
   analysis: z
     .string()
     .describe(
-      "A detailed, qualitative analysis explaining the rationale behind the admission chance. This should include the applicant's strengths, weaknesses, and concrete suggestions for improvement."
+      "A detailed, qualitative analysis explaining the rationale behind the admission chance. This should be broken into three paragraphs, each starting with 'Strengths:', 'Weaknesses:', and 'Suggestions for Improvement:' respectively. Do not use markdown like **."
     ),
 });
 export type CalculateAdmissionChanceOutput = z.infer<
@@ -76,12 +76,12 @@ Student Profile:
 
 Instructions:
 1.  **Calculate Percentage:** Based on all the provided data, estimate a specific admission percentage. Be realistic. A 95% average doesn't guarantee admission to a program like Waterloo Engineering or UofT Rotman Commerce if the extracurriculars are weak. Consider the competitiveness of the specific program mentioned.
-2.  **Provide Detailed Analysis:** Write a comprehensive analysis that breaks down your reasoning.
-    -   **Strengths:** Clearly identify the strongest parts of the application.
-    -   **Weaknesses:** Honestly point out the areas that weaken the application.
-    -   **Suggestions for Improvement:** Provide concrete, actionable advice on how the student could improve their chances.
+2.  **Provide Detailed Analysis:** Write a comprehensive analysis that breaks down your reasoning. It MUST be structured into three distinct paragraphs, separated by a newline.
+    -   Start the first paragraph with "Strengths:". Clearly identify the strongest parts of the application.
+    -   Start the second paragraph with "Weaknesses:". Honestly point out the areas that weaken the application.
+    -   Start the third paragraph with "Suggestions for Improvement:". Provide concrete, actionable advice on how the student could improve their chances.
 
-Your analysis is critical. It must justify the percentage you've given and provide real value to the student. Be direct, insightful, and act as a true expert.`,
+Your analysis is critical. It must justify the percentage you've given and provide real value to the student. Be direct, insightful, and act as a true expert. Do not use any markdown formatting like **.`,
 });
 
 const calculateAdmissionChanceFlow = ai.defineFlow(

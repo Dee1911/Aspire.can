@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Wand2, BrainCircuit, Loader2, Sparkles } from 'lucide-react';
+import { Wand2, BrainCircuit, Loader2, Sparkles, ThumbsUp, ThumbsDown, Lightbulb } from 'lucide-react';
 import { analyzeEssay, AnalyzeEssayOutput } from '@/ai/flows/essay-feedback';
 import { improveEssay } from '@/ai/flows/improve-essay';
 import { useToast } from '@/hooks/use-toast';
@@ -86,6 +86,13 @@ export default function EssayToolPage() {
     }
   };
 
+  const renderFeedbackContent = (text: string) => {
+    return text.split('* ').filter(item => item.trim() !== '').map((item, index) => (
+      <li key={index} className="text-sm text-muted-foreground">{item.trim()}</li>
+    ));
+  };
+
+
   return (
     <div className="space-y-6">
       <header>
@@ -153,29 +160,44 @@ export default function EssayToolPage() {
         </div>
 
         <div className="space-y-6">
+          {isAnalyzing && (
+            <Card className="flex items-center justify-center h-full min-h-[300px]">
+              <div className="text-center text-muted-foreground p-8">
+                <Loader2 className="mx-auto h-12 w-12 animate-spin" />
+                <p className="mt-4">Analyzing your essay...</p>
+              </div>
+            </Card>
+          )}
+
+          {isImproving && (
+            <Card className="flex items-center justify-center h-full min-h-[300px]">
+              <div className="text-center text-muted-foreground p-8">
+                <Loader2 className="mx-auto h-12 w-12 animate-spin" />
+                <p className="mt-4">Improving your essay...</p>
+              </div>
+            </Card>
+          )}
+          
           {feedback && (
             <Card>
               <CardHeader>
                 <CardTitle>Essay Feedback</CardTitle>
+                <CardDescription>
+                  Here is the AI's analysis of your essay.
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 <div>
-                  <h3 className="font-semibold text-lg">Strengths</h3>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                    {feedback.strengths}
-                  </p>
+                  <h3 className="font-semibold text-lg flex items-center mb-2 text-green-500"><ThumbsUp className="w-5 h-5 mr-2" />Strengths</h3>
+                  <ul className="list-disc pl-5 space-y-1">{renderFeedbackContent(feedback.strengths)}</ul>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg">Weaknesses</h3>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                    {feedback.weaknesses}
-                  </p>
+                  <h3 className="font-semibold text-lg flex items-center mb-2 text-red-500"><ThumbsDown className="w-5 h-5 mr-2" />Weaknesses</h3>
+                  <ul className="list-disc pl-5 space-y-1">{renderFeedbackContent(feedback.weaknesses)}</ul>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg">Suggestions</h3>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                    {feedback.suggestions}
-                  </p>
+                  <h3 className="font-semibold text-lg flex items-center mb-2 text-blue-500"><Lightbulb className="w-5 h-5 mr-2" />Suggestions</h3>
+                  <ul className="list-disc pl-5 space-y-1">{renderFeedbackContent(feedback.suggestions)}</ul>
                 </div>
               </CardContent>
             </Card>
