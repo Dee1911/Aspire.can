@@ -54,7 +54,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <Link href="/" className="flex items-center gap-2.5">
             <Compass className="text-primary size-7 shrink-0" />
             <span className="font-headline text-xl font-semibold group-data-[collapsible=icon]:hidden">
-              Aspire Compass
+              Aspire
             </span>
           </Link>
         </SidebarHeader>
@@ -84,7 +84,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <Link href="/" className="flex items-center gap-2">
               <Compass className="text-primary size-6" />
               <span className="font-headline text-lg font-semibold">
-                Aspire Compass
+                Aspire
               </span>
             </Link>
           </header>

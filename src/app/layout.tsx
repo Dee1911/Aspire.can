@@ -4,7 +4,7 @@ import { AppLayout } from '@/components/app-layout';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'Aspire Compass',
+  title: 'Aspire',
   description: 'Your guide to university applications.',
 };
 
