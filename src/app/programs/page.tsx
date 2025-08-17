@@ -28,8 +28,8 @@ const allFaculties = [...new Set(programs.map(p => p.faculty))].sort();
 
 export default function ProgramsPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [provinceFilter, setProvinceFilter] = useState('');
-  const [facultyFilter, setFacultyFilter] = useState('');
+  const [provinceFilter, setProvinceFilter] = useState('all-provinces');
+  const [facultyFilter, setFacultyFilter] = useState('all-faculties');
 
   const filteredPrograms = useMemo(() => {
     return programs.filter(program => {
@@ -38,12 +38,14 @@ export default function ProgramsPage() {
         program.programName.toLowerCase().includes(searchLower) ||
         program.universityName.toLowerCase().includes(searchLower);
 
-      const provinceMatch = provinceFilter
-        ? program.province === provinceFilter
-        : true;
-      const facultyMatch = facultyFilter
-        ? program.faculty === facultyFilter
-        : true;
+      const provinceMatch =
+        provinceFilter === 'all-provinces'
+          ? true
+          : program.province === provinceFilter;
+      const facultyMatch =
+        facultyFilter === 'all-faculties'
+          ? true
+          : program.faculty === facultyFilter;
 
       return termMatch && provinceMatch && facultyMatch;
     });
@@ -72,7 +74,7 @@ export default function ProgramsPage() {
                 <SelectValue placeholder="Filter by Province" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Provinces</SelectItem>
+                <SelectItem value="all-provinces">All Provinces</SelectItem>
                 {allProvinces.map(p => (
                   <SelectItem key={p} value={p}>
                     {p}
@@ -85,7 +87,7 @@ export default function ProgramsPage() {
                 <SelectValue placeholder="Filter by Faculty" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Faculties</SelectItem>
+                <SelectItem value="all-faculties">All Faculties</SelectItem>
                 {allFaculties.map(f => (
                   <SelectItem key={f} value={f}>
                     {f}
