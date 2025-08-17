@@ -44,7 +44,7 @@ const formSchema = z.object({
     .min(1, 'Please describe your career aspirations.'),
   extracurriculars: z
     .string()
-min(1, 'Please list your extracurriculars.'),
+    .min(1, 'Please list your extracurriculars.'),
 });
 
 export default function ProgramFinderPage() {
