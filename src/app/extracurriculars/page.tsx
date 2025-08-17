@@ -1,3 +1,7 @@
+
+'use client';
+
+import { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,41 +12,48 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Search } from 'lucide-react';
 import Image from 'next/image';
+import {
+  activities,
+  ExtracurricularActivity,
+} from '@/lib/extracurriculars-data';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
-const activities = [
-  {
-    name: 'DECA Club',
-    category: 'Business',
-    description: 'Participate in business case competitions.',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'business competition',
-  },
-  {
-    name: 'Varsity Soccer',
-    category: 'Athletics',
-    description: "Join the school's competitive soccer team.",
-    image: 'https://placehold.co/600x400.png',
-    hint: 'soccer game',
-  },
-  {
-    name: 'Model UN',
-    category: 'Academics',
-    description: 'Debate global issues and practice diplomacy.',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'public speaking',
-  },
-  {
-    name: 'School Band',
-    category: 'Arts',
-    description: 'Play an instrument in concerts and events.',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'concert band',
-  },
-];
+const provinces = [
+  ...new Set(activities.map(activity => activity.province)),
+].sort();
+const categories = [
+  ...new Set(activities.map(activity => activity.category)),
+].sort();
 
 export default function ExtracurricularsPage() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [provinceFilter, setProvinceFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+
+  const filteredActivities = useMemo(() => {
+    return activities.filter(activity => {
+      const searchTermMatch =
+        activity.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        activity.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const provinceMatch = provinceFilter
+        ? activity.province === provinceFilter
+        : true;
+      const categoryMatch = categoryFilter
+        ? activity.category === categoryFilter
+        : true;
+      return searchTermMatch && provinceMatch && categoryMatch;
+    });
+  }, [searchTerm, provinceFilter, categoryFilter]);
+
   return (
     <div className="space-y-6">
       <header>
@@ -54,8 +65,47 @@ export default function ExtracurricularsPage() {
         </p>
       </header>
 
+      <Card>
+        <CardContent className="p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Input
+              placeholder="Search by name or description..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="lg:col-span-2"
+            />
+            <Select onValueChange={setProvinceFilter} value={provinceFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filter by Province" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Provinces</SelectItem>
+                {provinces.map(p => (
+                  <SelectItem key={p} value={p}>
+                    {p}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select onValueChange={setCategoryFilter} value={categoryFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filter by Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Categories</SelectItem>
+                {categories.map(c => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {activities.map(activity => (
+        {filteredActivities.map(activity => (
           <Card key={activity.name}>
             <CardHeader className="p-0">
               <Image
@@ -68,13 +118,16 @@ export default function ExtracurricularsPage() {
               />
             </CardHeader>
             <CardContent className="p-4">
-              <Badge variant="secondary" className="mb-2">
-                {activity.category}
-              </Badge>
+              <div className="flex justify-between items-start mb-2">
+                <Badge variant="secondary">{activity.category}</Badge>
+                <p className="text-xs text-muted-foreground">{activity.province}</p>
+              </div>
               <CardTitle className="font-headline text-xl">
                 {activity.name}
               </CardTitle>
-              <CardDescription>{activity.description}</CardDescription>
+              <CardDescription>
+                Gain skills in: {activity.skillsGained}
+              </CardDescription>
             </CardContent>
             <CardFooter className="p-4 pt-0">
               <Button variant="outline" className="w-full">
