@@ -36,20 +36,22 @@ const categories = [
 
 export default function ExtracurricularsPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [provinceFilter, setProvinceFilter] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
+  const [provinceFilter, setProvinceFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
 
   const filteredActivities = useMemo(() => {
     return activities.filter(activity => {
       const searchTermMatch =
         activity.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         activity.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const provinceMatch = provinceFilter
-        ? activity.province === provinceFilter
-        : true;
-      const categoryMatch = categoryFilter
-        ? activity.category === categoryFilter
-        : true;
+      const provinceMatch =
+        provinceFilter === 'all'
+          ? true
+          : activity.province === provinceFilter;
+      const categoryMatch =
+        categoryFilter === 'all'
+          ? true
+          : activity.category === categoryFilter;
       return searchTermMatch && provinceMatch && categoryMatch;
     });
   }, [searchTerm, provinceFilter, categoryFilter]);
@@ -79,7 +81,7 @@ export default function ExtracurricularsPage() {
                 <SelectValue placeholder="Filter by Province" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Provinces</SelectItem>
+                <SelectItem value="all">All Provinces</SelectItem>
                 {provinces.map(p => (
                   <SelectItem key={p} value={p}>
                     {p}
@@ -92,7 +94,7 @@ export default function ExtracurricularsPage() {
                 <SelectValue placeholder="Filter by Category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 {categories.map(c => (
                   <SelectItem key={c} value={c}>
                     {c}
