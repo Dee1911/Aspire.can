@@ -10,7 +10,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-export const GenerateTimelineInputSchema = z.object({
+const GenerateTimelineInputSchema = z.object({
   grade: z.string().describe('The student\'s current grade level (e.g., "11" or "12").'),
   goals: z
     .string()
@@ -30,7 +30,7 @@ const MilestoneSchema = z.object({
   task: z.string().describe('The specific task or action item for that milestone.'),
 });
 
-export const GenerateTimelineOutputSchema = z.object({
+const GenerateTimelineOutputSchema = z.object({
   milestones: z
     .array(MilestoneSchema)
     .describe('A list of personalized milestones for the application journey.'),

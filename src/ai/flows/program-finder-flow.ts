@@ -10,17 +10,17 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-export const FindProgramsInputSchema = z.object({
-  grades: z.string().describe('The student\'s grades or academic average.'),
+const FindProgramsInputSchema = z.object({
+  grades: z.string().describe("The student's grades or academic average."),
   interests: z
     .string()
-    .describe('The student\'s academic interests and favorite subjects.'),
+    .describe("The student's academic interests and favorite subjects."),
   careerAspirations: z
     .string()
-    .describe('The student\'s career goals and aspirations.'),
+    .describe("The student's career goals and aspirations."),
   extracurriculars: z
     .string()
-    .describe('The student\'s extracurricular activities and hobbies.'),
+    .describe("The student's extracurricular activities and hobbies."),
 });
 export type FindProgramsInput = z.infer<typeof FindProgramsInputSchema>;
 
@@ -29,7 +29,7 @@ const ProgramSuggestionSchema = z.object({
   universityName: z.string().describe('The name of the university.'),
 });
 
-export const FindProgramsOutputSchema = z.object({
+const FindProgramsOutputSchema = z.object({
   reach: z
     .array(ProgramSuggestionSchema)
     .describe('A list of "reach" program suggestions.'),
