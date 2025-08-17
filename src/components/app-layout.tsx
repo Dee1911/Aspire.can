@@ -24,11 +24,17 @@ import {
   BookOpen,
   Target,
   FileClock,
+  Calculator,
 } from 'lucide-react';
 
 const navItems = [
   { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/program-finder', icon: Target, label: 'AI Program Finder' },
+  {
+    href: '/admission-calculator',
+    icon: Calculator,
+    label: 'Admission Calculator',
+  },
   { href: '/timeline-generator', icon: FileClock, label: 'Timeline Generator' },
   { href: '/programs', icon: GraduationCap, label: 'Program Explorer' },
   { href: '/scholarships', icon: DollarSign, label: 'Scholarships' },
