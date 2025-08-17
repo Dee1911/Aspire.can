@@ -24,12 +24,17 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import {
   findPrograms,
-  FindProgramsInput,
   FindProgramsOutput,
 } from '@/ai/flows/program-finder-flow';
 import { useState } from 'react';
 import { Loader2, Rocket, Shield, Sparkles, Target } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 const formSchema = z.object({
   grades: z.string().min(1, 'Please enter your grades or average.'),
@@ -39,7 +44,7 @@ const formSchema = z.object({
     .min(1, 'Please describe your career aspirations.'),
   extracurriculars: z
     .string()
-    .min(1, 'Please list your extracurriculars.'),
+min(1, 'Please list your extracurriculars.'),
 });
 
 export default function ProgramFinderPage() {
@@ -86,7 +91,7 @@ export default function ProgramFinderPage() {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-1">
           <Card>
             <CardHeader>
               <CardTitle>Your Profile</CardTitle>
@@ -113,7 +118,7 @@ export default function ProgramFinderPage() {
                           />
                         </FormControl>
                         <FormDescription>
-                          Enter your current academic average or GPA.
+                          Your academic standing.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -132,7 +137,7 @@ export default function ProgramFinderPage() {
                           />
                         </FormControl>
                         <FormDescription>
-                          What subjects or topics are you passionate about?
+                          Your passions and favorite subjects.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -151,7 +156,7 @@ export default function ProgramFinderPage() {
                           />
                         </FormControl>
                         <FormDescription>
-                          What kind of career are you hoping to pursue?
+                          Your future career goals.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -170,7 +175,7 @@ export default function ProgramFinderPage() {
                           />
                         </FormControl>
                         <FormDescription>
-                          What do you do outside of class?
+                          Your activities outside of class.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -190,12 +195,12 @@ export default function ProgramFinderPage() {
           </Card>
         </div>
 
-        <div>
+        <div className="lg:col-span-2">
           <Card className="min-h-full">
             <CardHeader>
               <CardTitle>AI Recommendations</CardTitle>
               <CardDescription>
-                Based on your profile, we suggest:
+                Based on your profile, we suggest these programs.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -208,49 +213,70 @@ export default function ProgramFinderPage() {
                 <div className="text-center text-muted-foreground p-8 flex flex-col items-center justify-center min-h-[300px]">
                   <Sparkles className="mx-auto h-12 w-12" />
                   <p className="mt-4">
-                    Your program recommendations will appear here.
+                    Your detailed program recommendations will appear here.
                   </p>
                 </div>
               )}
               {recommendations && (
-                <>
+                <div className="space-y-6">
                   <div>
-                    <h3 className="flex items-center font-semibold mb-2">
-                      <Rocket className="w-5 h-5 mr-2 text-primary" /> Reach
+                    <h3 className="flex items-center font-bold text-xl mb-3">
+                      <Rocket className="w-6 h-6 mr-2 text-primary" /> Reach
                     </h3>
-                    <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                      {recommendations.reach.map(program => (
-                        <li key={program.programName}>
-                          {program.programName} at {program.universityName}
-                        </li>
+                    <Accordion type="single" collapsible className="w-full space-y-2">
+                      {recommendations.reach.map((program, i) => (
+                        <AccordionItem value={`reach-${i}`} key={`reach-${i}`} className='bg-card border rounded-lg'>
+                          <AccordionTrigger className='p-4 font-semibold hover:no-underline'>
+                            {program.programName} - {program.universityName}
+                          </AccordionTrigger>
+                          <AccordionContent className='p-4 pt-0 space-y-3'>
+                            <p className="text-muted-foreground">{program.justification}</p>
+                            <p><strong className="text-foreground">Requirements:</strong> {program.admissionRequirements}</p>
+                            <p><strong className="text-foreground">Career Paths:</strong> {program.careerPaths}</p>
+                          </AccordionContent>
+                        </AccordionItem>
                       ))}
-                    </ul>
+                    </Accordion>
                   </div>
-                  <div>
-                    <h3 className="flex items-center font-semibold mb-2">
-                      <Target className="w-5 h-5 mr-2 text-primary" /> Target
+                   <div>
+                    <h3 className="flex items-center font-bold text-xl mb-3">
+                      <Target className="w-6 h-6 mr-2 text-primary" /> Target
                     </h3>
-                    <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                      {recommendations.target.map(program => (
-                        <li key={program.programName}>
-                          {program.programName} at {program.universityName}
-                        </li>
+                    <Accordion type="single" collapsible className="w-full space-y-2">
+                      {recommendations.target.map((program, i) => (
+                        <AccordionItem value={`target-${i}`} key={`target-${i}`} className='bg-card border rounded-lg'>
+                          <AccordionTrigger className='p-4 font-semibold hover:no-underline'>
+                            {program.programName} - {program.universityName}
+                          </AccordionTrigger>
+                          <AccordionContent className='p-4 pt-0 space-y-3'>
+                            <p className="text-muted-foreground">{program.justification}</p>
+                            <p><strong className="text-foreground">Requirements:</strong> {program.admissionRequirements}</p>
+                            <p><strong className="text-foreground">Career Paths:</strong> {program.careerPaths}</p>
+                          </AccordionContent>
+                        </AccordionItem>
                       ))}
-                    </ul>
+                    </Accordion>
                   </div>
-                  <div>
-                    <h3 className="flex items-center font-semibold mb-2">
-                      <Shield className="w-5 h-5 mr-2 text-primary" /> Safety
+                   <div>
+                    <h3 className="flex items-center font-bold text-xl mb-3">
+                      <Shield className="w-6 h-6 mr-2 text-primary" /> Safety
                     </h3>
-                    <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                      {recommendations.safety.map(program => (
-                        <li key={program.programName}>
-                          {program.programName} at {program.universityName}
-                        </li>
+                    <Accordion type="single" collapsible className="w-full space-y-2">
+                      {recommendations.safety.map((program, i) => (
+                        <AccordionItem value={`safety-${i}`} key={`safety-${i}`} className='bg-card border rounded-lg'>
+                          <AccordionTrigger className='p-4 font-semibold hover:no-underline'>
+                             {program.programName} - {program.universityName}
+                          </AccordionTrigger>
+                           <AccordionContent className='p-4 pt-0 space-y-3'>
+                            <p className="text-muted-foreground">{program.justification}</p>
+                            <p><strong className="text-foreground">Requirements:</strong> {program.admissionRequirements}</p>
+                            <p><strong className="text-foreground">Career Paths:</strong> {program.careerPaths}</p>
+                          </AccordionContent>
+                        </AccordionItem>
                       ))}
-                    </ul>
+                    </Accordion>
                   </div>
-                </>
+                </div>
               )}
             </CardContent>
           </Card>
