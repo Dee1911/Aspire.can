@@ -1,5 +1,8 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -17,9 +20,61 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Calendar, PlusCircle } from 'lucide-react';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import {
+  generateTimeline,
+  GenerateTimelineOutput,
+} from '@/ai/flows/timeline-generator-flow';
+import { Loader2, PlusCircle, Sparkles } from 'lucide-react';
+
+const formSchema = z.object({
+  grade: z.string().min(1, 'Please select your grade.'),
+  goals: z.string().min(1, 'Please enter your goals.'),
+  universities: z.string().min(1, 'Please list your target universities.'),
+});
 
 export default function TimelineGeneratorPage() {
+  const [timeline, setTimeline] = useState<GenerateTimelineOutput | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      grade: '',
+      goals: '',
+      universities: '',
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    setTimeline(null);
+    try {
+      const result = await generateTimeline(values);
+      setTimeline(result);
+    } catch (error) {
+      console.error('Error generating timeline:', error);
+      toast({
+        title: 'Timeline Generation Failed',
+        description: 'Could not generate a timeline. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <header>
@@ -36,31 +91,82 @@ export default function TimelineGeneratorPage() {
             <CardHeader>
               <CardTitle>Your Info</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="grade">Current Grade</Label>
-                <Select>
-                  <SelectTrigger id="grade">
-                    <SelectValue placeholder="Select your grade" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="11">Grade 11</SelectItem>
-                    <SelectItem value="12">Grade 12</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="goals">Goals</Label>
-                <Input
-                  id="goals"
-                  placeholder="e.g., Early admission, specific scholarships"
-                />
-              </div>
-              <div>
-                <Label htmlFor="universities">Target Universities</Label>
-                <Input id="universities" placeholder="e.g., UofT, Waterloo" />
-              </div>
-              <Button className="w-full">Generate Timeline</Button>
+            <CardContent>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-4"
+                >
+                  <FormField
+                    control={form.control}
+                    name="grade"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Current Grade</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select your grade" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="11">Grade 11</SelectItem>
+                            <SelectItem value="12">Grade 12</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="goals"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Goals</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., Early admission, scholarships"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="universities"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Target Universities</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., UofT, Waterloo, McGill"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Sparkles className="mr-2 h-4 w-4" />
+                    )}
+                    Generate Timeline
+                  </Button>
+                </form>
+              </Form>
             </CardContent>
           </Card>
         </div>
@@ -74,42 +180,37 @@ export default function TimelineGeneratorPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-muted rounded-md">
-                  <div>
-                    <p className="font-semibold">September 2024</p>
-                    <p className="text-sm text-muted-foreground">
-                      Finalize university list
+                {isLoading && (
+                  <div className="flex items-center justify-center h-full min-h-[300px]">
+                    <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
+                  </div>
+                )}
+                {!isLoading && !timeline && (
+                  <div className="text-center text-muted-foreground p-8 flex flex-col items-center justify-center min-h-[300px]">
+                    <Sparkles className="mx-auto h-12 w-12" />
+                    <p className="mt-4">
+                      Your personalized timeline will appear here.
                     </p>
                   </div>
-                  <Button variant="ghost" size="sm">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Add to Calendar
-                  </Button>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-muted rounded-md">
-                  <div>
-                    <p className="font-semibold">October 2024</p>
-                    <p className="text-sm text-muted-foreground">
-                      Draft personal statements
-                    </p>
-                  </div>
-                  <Button variant="ghost" size="sm">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Add to Calendar
-                  </Button>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-muted rounded-md">
-                  <div>
-                    <p className="font-semibold">November 2024</p>
-                    <p className="text-sm text-muted-foreground">
-                      Submit early applications
-                    </p>
-                  </div>
-                  <Button variant="ghost" size="sm">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Add to Calendar
-                  </Button>
-                </div>
+                )}
+                {timeline &&
+                  timeline.milestones.map((milestone, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center p-3 bg-muted rounded-md"
+                    >
+                      <div>
+                        <p className="font-semibold">{milestone.date}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {milestone.task}
+                        </p>
+                      </div>
+                      <Button variant="ghost" size="sm">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Add to Calendar
+                      </Button>
+                    </div>
+                  ))}
               </div>
             </CardContent>
           </Card>
