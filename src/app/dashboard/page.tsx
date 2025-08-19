@@ -43,17 +43,35 @@ import {
   FileClock,
   Calculator,
   Loader2,
+  ChevronDown,
+  Trash2,
+  ListTodo,
+  StickyNote,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/hooks/use-auth';
-import { getApplications, addApplication, updateApplication, Application, ApplicationData } from '@/lib/user-data/applications';
+import {
+  getApplications,
+  addApplication,
+  updateApplication,
+  Application,
+  ApplicationData,
+  ApplicationTask,
+  addTaskToApplication,
+  updateApplicationTask,
+  deleteApplicationTask,
+} from '@/lib/user-data/applications';
 import { addDeadline } from '@/lib/user-data/deadlines';
 import { useToast } from '@/hooks/use-toast';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useDebouncedCallback } from 'use-debounce';
 
 export type ApplicationType = 'Reach' | 'Target' | 'Safety';
 export type ApplicationProgress =
@@ -140,81 +158,181 @@ const addApplicationSchema = z.object({
 function ApplicationRow({
   application,
   onUpdate,
+  onTaskUpdate,
 }: {
   application: Application;
-  onUpdate: (id: string, field: keyof Application, value: any) => void;
+  onUpdate: (id: string, data: Partial<ApplicationData>) => void;
+  onTaskUpdate: (appId: string, taskId: string, data: Partial<ApplicationTask>) => void;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
   const Icon = typeIcons[application.type];
   const color = typeColors[application.type];
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [newTaskText, setNewTaskText] = useState('');
+
+  const debouncedNotesUpdate = useDebouncedCallback((value) => {
+    if (user) {
+      onUpdate(application.id, { notes: value });
+    }
+  }, 1000);
+
+  const handleAddTask = async () => {
+    if (!user || !newTaskText.trim()) return;
+    try {
+      await addTaskToApplication(user.uid, application.id, { text: newTaskText, completed: false });
+      onTaskUpdate(application.id, 'new', { text: newTaskText, completed: false });
+      setNewTaskText('');
+    } catch (error) {
+      console.error("Failed to add task:", error);
+      toast({
+        title: "Add Task Failed",
+        description: "Could not add the new task. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    if (!user) return;
+    try {
+      await deleteApplicationTask(user.uid, application.id, taskId);
+      onTaskUpdate(application.id, taskId, { deleted: true }); // Use a special flag for optimistic update
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+      toast({
+        title: "Delete Failed",
+        description: "Could not delete the task. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
-    <TableRow>
-      <TableCell className="font-medium">{application.name}</TableCell>
-      <TableCell>
-        <Input
-          type="date"
-          value={application.deadline}
-          onChange={e =>
-            onUpdate(application.id, 'deadline', e.target.value)
-          }
-          className="max-w-[150px]"
-        />
-      </TableCell>
-      <TableCell>
-        <Select
-          value={application.type}
-          onValueChange={(value: ApplicationType) =>
-            onUpdate(application.id, 'type', value)
-          }
-        >
-          <SelectTrigger className="w-[120px]">
-            <SelectValue>
-              <span className="flex items-center gap-2">
-                <Icon className={`w-4 h-4 ${color}`} />
-                {application.type}
-              </span>
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Safety">
-              <span className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-green-500" /> Safety
-              </span>
-            </SelectItem>
-            <SelectItem value="Target">
-              <span className="flex items-center gap-2">
-                <Target className="w-4 h-4 text-blue-500" /> Target
-              </span>
-            </SelectItem>
-            <SelectItem value="Reach">
-              <span className="flex items-center gap-2">
-                <Rocket className="w-4 h-4 text-red-500" /> Reach
-              </span>
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </TableCell>
-      <TableCell>
-        <Select
-          value={application.progress}
-          onValueChange={(value: ApplicationProgress) =>
-            onUpdate(application.id, 'progress', value)
-          }
-        >
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Progress" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Not Started">Not Started</SelectItem>
-            <SelectItem value="In Progress">In Progress</SelectItem>
-            <SelectItem value="Applied">Applied</SelectItem>
-            <SelectItem value="Completed">Completed</SelectItem>
-          </SelectContent>
-        </Select>
-      </TableCell>
-    </TableRow>
+    <Fragment>
+      <TableRow onClick={() => setIsOpen(!isOpen)} className="cursor-pointer">
+        <TableCell className="font-medium">{application.name}</TableCell>
+        <TableCell>
+          <Input
+            type="date"
+            value={application.deadline}
+            onClick={e => e.stopPropagation()}
+            onChange={e =>
+              onUpdate(application.id, { deadline: e.target.value })
+            }
+            className="max-w-[150px]"
+          />
+        </TableCell>
+        <TableCell>
+          <Select
+            value={application.type}
+            onValueChange={(value: ApplicationType) =>
+              onUpdate(application.id, { type: value })
+            }
+          >
+            <SelectTrigger onClick={e => e.stopPropagation()} className="w-[120px]">
+              <SelectValue>
+                <span className="flex items-center gap-2">
+                  <Icon className={`w-4 h-4 ${color}`} />
+                  {application.type}
+                </span>
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Safety">
+                <span className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-green-500" /> Safety
+                </span>
+              </SelectItem>
+              <SelectItem value="Target">
+                <span className="flex items-center gap-2">
+                  <Target className="w-4 h-4 text-blue-500" /> Target
+                </span>
+              </SelectItem>
+              <SelectItem value="Reach">
+                <span className="flex items-center gap-2">
+                  <Rocket className="w-4 h-4 text-red-500" /> Reach
+                </span>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </TableCell>
+        <TableCell>
+          <Select
+            value={application.progress}
+            onValueChange={(value: ApplicationProgress) =>
+              onUpdate(application.id, { progress: value })
+            }
+          >
+            <SelectTrigger onClick={e => e.stopPropagation()} className="w-[150px]">
+              <SelectValue placeholder="Progress" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Not Started">Not Started</SelectItem>
+              <SelectItem value="In Progress">In Progress</SelectItem>
+              <SelectItem value="Applied">Applied</SelectItem>
+              <SelectItem value="Completed">Completed</SelectItem>
+            </SelectContent>
+          </Select>
+        </TableCell>
+        <TableCell className="text-right">
+          <Button variant="ghost" size="icon" className="transition-transform" data-state={isOpen ? 'open' : 'closed'}>
+            <ChevronDown className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+          </Button>
+        </TableCell>
+      </TableRow>
+      <TableRow className="p-0">
+        <TableCell colSpan={5} className="p-0 border-0">
+          <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+            <CollapsibleContent>
+              <div className="bg-muted/50 p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-semibold mb-2 flex items-center gap-2"><ListTodo className="w-5 h-5"/>To-Do List</h4>
+                  <div className="space-y-2">
+                    {application.tasks?.map(task => (
+                      <div key={task.id} className="flex items-center gap-2 group">
+                        <Checkbox
+                          id={`task-${task.id}`}
+                          checked={task.completed}
+                          onCheckedChange={(checked) => onTaskUpdate(application.id, task.id, { completed: !!checked })}
+                        />
+                        <label htmlFor={`task-${task.id}`} className={`flex-1 text-sm ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
+                          {task.text}
+                        </label>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100" onClick={() => handleDeleteTask(task.id)}>
+                            <Trash2 className="h-4 w-4 text-destructive"/>
+                        </Button>
+                      </div>
+                    ))}
+                    <div className="flex gap-2 mt-2">
+                       <Input 
+                          placeholder="Add a new task..."
+                          value={newTaskText}
+                          onChange={(e) => setNewTaskText(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && handleAddTask()}
+                       />
+                       <Button onClick={handleAddTask}>Add</Button>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-2 flex items-center gap-2"><StickyNote className="w-5 h-5"/>Notes</h4>
+                  <Textarea
+                    placeholder="Add notes for this application..."
+                    rows={8}
+                    defaultValue={application.notes}
+                    onChange={(e) => debouncedNotesUpdate(e.target.value)}
+                  />
+                </div>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        </TableCell>
+      </TableRow>
+    </Fragment>
   );
 }
+
 
 export default function DashboardPage() {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -246,17 +364,16 @@ export default function DashboardPage() {
 
   const handleUpdate = async (
     id: string,
-    field: keyof Application,
-    value: any
+    data: Partial<ApplicationData>
   ) => {
     if (!user) return;
     const optimisticApps = applications.map(app =>
-      app.id === id ? { ...app, [field]: value } : app
+      app.id === id ? { ...app, ...data } : app
     );
     setApplications(optimisticApps);
 
     try {
-      await updateApplication(user.uid, id, { [field]: value });
+      await updateApplication(user.uid, id, data);
     } catch (error) {
       console.error("Failed to update application:", error);
       toast({
@@ -265,6 +382,31 @@ export default function DashboardPage() {
         variant: "destructive",
       });
       // Revert optimistic update
+      const userApps = await getApplications(user.uid);
+      setApplications(userApps);
+    }
+  };
+
+  const handleTaskUpdate = async (appId: string, taskId: string, data: any) => {
+    if (!user) return;
+
+    setApplications(prevApps => prevApps.map(app => {
+      if (app.id !== appId) return app;
+
+      let newTasks;
+      if (data.deleted) {
+        newTasks = app.tasks?.filter(t => t.id !== taskId);
+      } else if (taskId === 'new') {
+        newTasks = [...(app.tasks || []), { id: `temp-${Date.now()}`, ...data }];
+      } else {
+        newTasks = app.tasks?.map(t => t.id === taskId ? { ...t, ...data } : t);
+      }
+      
+      return { ...app, tasks: newTasks };
+    }));
+
+    if (taskId === 'new') {
+       // Refresh from DB to get the real new task
       const userApps = await getApplications(user.uid);
       setApplications(userApps);
     }
@@ -282,7 +424,10 @@ export default function DashboardPage() {
 
     try {
       const newAppId = await addApplication(user.uid, newAppData);
-      setApplications([{ id: newAppId, ...newAppData }, ...applications]);
+      
+      // Fetch fresh list to include new app with its default tasks
+      const userApps = await getApplications(user.uid);
+      setApplications(userApps);
 
       // Add corresponding deadline to calendar
       await addDeadline(user.uid, {
@@ -428,6 +573,7 @@ export default function DashboardPage() {
                   <TableHead>Deadline</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Progress</TableHead>
+                  <TableHead className="text-right w-[50px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -436,6 +582,7 @@ export default function DashboardPage() {
                     key={app.id}
                     application={app}
                     onUpdate={handleUpdate}
+                    onTaskUpdate={handleTaskUpdate}
                   />
                 ))}
               </TableBody>
@@ -446,3 +593,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+

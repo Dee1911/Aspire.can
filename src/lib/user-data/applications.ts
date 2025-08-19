@@ -2,7 +2,6 @@ import { db } from '@/lib/firebase';
 import {
   collection,
   query,
-  where,
   getDocs,
   doc,
   setDoc,
@@ -10,7 +9,14 @@ import {
   updateDoc,
   deleteDoc,
   Timestamp,
+  writeBatch,
 } from 'firebase/firestore';
+
+export interface ApplicationTask {
+  id: string;
+  text: string;
+  completed: boolean;
+}
 
 export interface Application {
   id: string;
@@ -18,36 +24,95 @@ export interface Application {
   deadline: string;
   type: 'Reach' | 'Target' | 'Safety';
   progress: 'Not Started' | 'In Progress' | 'Applied' | 'Completed';
+  notes?: string;
+  tasks?: ApplicationTask[];
 }
 
-export type ApplicationData = Omit<Application, 'id'>;
+export type ApplicationData = Omit<Application, 'id' | 'tasks'>;
+export type ApplicationTaskData = Omit<ApplicationTask, 'id'>;
 
 
-// Function to get all applications for a user
+// Function to get all applications for a user, including their tasks
 export const getApplications = async (userId: string): Promise<Application[]> => {
-  const q = query(collection(db, `users/${userId}/applications`));
-  const querySnapshot = await getDocs(q);
+  const appsQuery = query(collection(db, `users/${userId}/applications`));
+  const querySnapshot = await getDocs(appsQuery);
   const applications: Application[] = [];
-  querySnapshot.forEach((doc) => {
-    applications.push({ id: doc.id, ...doc.data() } as Application);
-  });
-  return applications;
+
+  for (const appDoc of querySnapshot.docs) {
+    const appData = { id: appDoc.id, ...appDoc.data() } as Application;
+    
+    // Fetch sub-collection of tasks
+    const tasksQuery = query(collection(db, `users/${userId}/applications/${appDoc.id}/tasks`));
+    const tasksSnapshot = await getDocs(tasksQuery);
+    appData.tasks = tasksSnapshot.docs.map(taskDoc => ({
+      id: taskDoc.id,
+      ...taskDoc.data()
+    } as ApplicationTask));
+
+    applications.push(appData);
+  }
+  
+  return applications.sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
 };
 
-// Function to add a new application for a user
+
+// Function to add a new application for a user, including default tasks
 export const addApplication = async (userId: string, application: ApplicationData): Promise<string> => {
-  const docRef = await addDoc(collection(db, `users/${userId}/applications`), application);
-  return docRef.id;
+    const batch = writeBatch(db);
+
+    const newAppRef = doc(collection(db, `users/${userId}/applications`));
+    batch.set(newAppRef, application);
+
+    const defaultTasks = [
+        { text: 'Complete Supplementary Application', completed: false },
+        { text: 'Request Reference Letters', completed: false },
+        { text: 'Submit Portfolio (if applicable)', completed: false },
+        { text: 'Pay Application Fee', completed: false },
+    ];
+
+    defaultTasks.forEach(task => {
+        const taskRef = doc(collection(newAppRef, 'tasks'));
+        batch.set(taskRef, task);
+    });
+
+    await batch.commit();
+    return newAppRef.id;
 };
 
-// Function to update an application
+
+// Function to update an application (e.g., progress, notes)
 export const updateApplication = async (userId: string, applicationId: string, data: Partial<ApplicationData>) => {
   const appRef = doc(db, `users/${userId}/applications`, applicationId);
-  await updateDoc(appRef, data);
+  // We should not be trying to update tasks with this function.
+  const { tasks, ...updateData } = data;
+  await updateDoc(appRef, updateData);
 };
+
 
 // Function to delete an application
 export const deleteApplication = async (userId: string, applicationId: string) => {
   const appRef = doc(db, `users/${userId}/applications`, applicationId);
   await deleteDoc(appRef);
+};
+
+
+// --- Task-specific functions ---
+
+// Function to add a new task to an application
+export const addTaskToApplication = async (userId: string, applicationId: string, task: ApplicationTaskData): Promise<string> => {
+    const tasksCollectionRef = collection(db, `users/${userId}/applications/${applicationId}/tasks`);
+    const docRef = await addDoc(tasksCollectionRef, task);
+    return docRef.id;
+};
+
+// Function to update a task in an application
+export const updateApplicationTask = async (userId: string, applicationId: string, taskId: string, data: Partial<ApplicationTaskData>) => {
+    const taskRef = doc(db, `users/${userId}/applications/${applicationId}/tasks`, taskId);
+    await updateDoc(taskRef, data);
+};
+
+// Function to delete a task from an application
+export const deleteApplicationTask = async (userId: string, applicationId: string, taskId: string) => {
+    const taskRef = doc(db, `users/${userId}/applications/${applicationId}/tasks`, taskId);
+    await deleteDoc(taskRef);
 };
