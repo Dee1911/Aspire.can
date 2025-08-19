@@ -1,11 +1,17 @@
-'use client'; // Calendar is a client component
+'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-const deadlines = [
+interface Deadline {
+  date: string;
+  name: string;
+  type: 'Program' | 'Scholarship' | 'Task';
+}
+
+const initialDeadlines: Deadline[] = [
   { date: '2025-01-15', name: 'UofT CompSci Application', type: 'Program' },
   {
     date: '2025-01-31',
@@ -22,8 +28,29 @@ const deadlines = [
 
 export default function CalendarPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [deadlines, setDeadlines] = useState<Deadline[]>(initialDeadlines);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const savedDeadlines = localStorage.getItem('deadlines');
+    if (savedDeadlines) {
+      setDeadlines(JSON.parse(savedDeadlines));
+    }
+    setIsLoaded(true);
+  }, []);
+  
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('deadlines', JSON.stringify(deadlines));
+    }
+  }, [deadlines, isLoaded]);
+
 
   const deadlineDates = deadlines.map(d => new Date(d.date + 'T00:00:00'));
+
+  if (!isLoaded) {
+    return null; // Or a loading spinner
+  }
 
   return (
     <div className="space-y-6">
@@ -79,7 +106,9 @@ export default function CalendarPage() {
                     </div>
                     <Badge
                       variant={
-                        deadline.type === 'Program' ? 'default' : 'secondary'
+                        deadline.type === 'Program' ? 'default'
+                        : deadline.type === 'Task' ? 'secondary'
+                        : 'outline'
                       }
                     >
                       {deadline.type}

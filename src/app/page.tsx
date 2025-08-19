@@ -1,6 +1,15 @@
 
 'use client';
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,15 +47,20 @@ import {
 import type { VariantProps } from 'class-variance-authority';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
-type ApplicationType = 'Reach' | 'Target' | 'Safety';
-type ApplicationProgress =
+
+export type ApplicationType = 'Reach' | 'Target' | 'Safety';
+export type ApplicationProgress =
   | 'Not Started'
   | 'In Progress'
   | 'Applied'
   | 'Completed';
 
-interface Application {
+export interface Application {
   id: number;
   name: string;
   deadline: string;
@@ -161,6 +175,12 @@ const typeColors: Record<ApplicationType, string> = {
   Safety: 'text-green-500',
 };
 
+const addApplicationSchema = z.object({
+  name: z.string().min(1, 'College name is required.'),
+  deadline: z.string().min(1, 'Deadline is required.'),
+  type: z.enum(['Reach', 'Target', 'Safety']),
+});
+
 function ApplicationRow({
   application,
   onUpdate,
@@ -243,7 +263,16 @@ function ApplicationRow({
 export default function DashboardPage() {
   const [applications, setApplications] =
     useState<Application[]>(initialApplications);
-  const [newCollegeName, setNewCollegeName] = useState('');
+  const [isAddDialogOpen, setAddDialogOpen] = useState(false);
+  
+  const form = useForm<z.infer<typeof addApplicationSchema>>({
+    resolver: zodResolver(addApplicationSchema),
+    defaultValues: {
+      name: '',
+      deadline: new Date().toISOString().split('T')[0],
+      type: 'Target',
+    },
+  });
 
   const handleUpdate = (
     id: number,
@@ -257,18 +286,17 @@ export default function DashboardPage() {
     );
   };
 
-  const handleAddCollege = () => {
-    if (newCollegeName.trim()) {
-      const newApp: Application = {
-        id: Date.now(),
-        name: newCollegeName.trim(),
-        deadline: new Date().toISOString().split('T')[0], // Default to today
-        type: 'Target',
-        progress: 'Not Started',
-      };
-      setApplications([newApp, ...applications]);
-      setNewCollegeName('');
-    }
+  const handleAddCollege = (values: z.infer<typeof addApplicationSchema>) => {
+    const newApp: Application = {
+      id: Date.now(),
+      name: values.name,
+      deadline: values.deadline,
+      type: values.type,
+      progress: 'Not Started',
+    };
+    setApplications([newApp, ...applications]);
+    setAddDialogOpen(false);
+    form.reset();
   };
 
   return (
@@ -286,7 +314,7 @@ export default function DashboardPage() {
         {shortcutCards.map(card => (
           <Card
             key={card.title}
-            className="hover:border-primary/50 transition-colors"
+            className="hover:border-primary/50 transition-colors bg-card"
           >
             <Link href={card.href} className="block h-full p-6">
               <div className="flex items-center justify-between">
@@ -306,18 +334,76 @@ export default function DashboardPage() {
         <CardHeader>
           <div className="flex flex-col sm:flex-row gap-4 justify-between sm:items-center">
             <CardTitle>Your Application Tracker</CardTitle>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Enter a new college name..."
-                className="w-full sm:w-auto"
-                value={newCollegeName}
-                onChange={e => setNewCollegeName(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleAddCollege()}
-              />
-              <Button onClick={handleAddCollege}>
-                <PlusCircle className="mr-2 h-4 w-4" /> Add Application
-              </Button>
-            </div>
+            <Dialog open={isAddDialogOpen} onOpenChange={setAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <PlusCircle className="mr-2 h-4 w-4" /> Add Application
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Application</DialogTitle>
+                  <DialogDescription>
+                    Enter the details of the new application you want to track.
+                  </DialogDescription>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(handleAddCollege)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>College/University Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g., University of Example" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="deadline"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Application Deadline</FormLabel>
+                          <FormControl>
+                            <Input type="date" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                     <FormField
+                      control={form.control}
+                      name="type"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Application Type</FormLabel>
+                           <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select an application type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="Safety">Safety</SelectItem>
+                              <SelectItem value="Target">Target</SelectItem>
+                              <SelectItem value="Reach">Reach</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <DialogFooter>
+                      <Button type="submit">Add Application</Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
           </div>
         </CardHeader>
         <CardContent>

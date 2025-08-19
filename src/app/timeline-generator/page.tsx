@@ -12,7 +12,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -23,7 +22,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -34,14 +32,23 @@ import { useToast } from '@/hooks/use-toast';
 import {
   generateTimeline,
   GenerateTimelineOutput,
+  Milestone,
 } from '@/ai/flows/timeline-generator-flow';
 import { Loader2, PlusCircle, Sparkles } from 'lucide-react';
+import { format, parse } from 'date-fns';
 
 const formSchema = z.object({
   grade: z.string().min(1, 'Please select your grade.'),
   goals: z.string().min(1, 'Please enter your goals.'),
   universities: z.string().min(1, 'Please list your target universities.'),
 });
+
+interface Deadline {
+  date: string;
+  name: string;
+  type: 'Program' | 'Scholarship' | 'Task';
+}
+
 
 export default function TimelineGeneratorPage() {
   const [timeline, setTimeline] = useState<GenerateTimelineOutput | null>(null);
@@ -56,6 +63,40 @@ export default function TimelineGeneratorPage() {
       universities: '',
     },
   });
+
+  const handleAddToCalendar = (milestone: Milestone) => {
+    try {
+      const parsedDate = parse(milestone.date, 'MMMM yyyy', new Date());
+      if (isNaN(parsedDate.getTime())) {
+        throw new Error('Invalid date format');
+      }
+      
+      const newDeadline: Deadline = {
+        date: format(parsedDate, 'yyyy-MM-dd'),
+        name: milestone.task,
+        type: 'Task',
+      };
+
+      const savedDeadlines = localStorage.getItem('deadlines');
+      const deadlines: Deadline[] = savedDeadlines ? JSON.parse(savedDeadlines) : [];
+      
+      deadlines.push(newDeadline);
+
+      localStorage.setItem('deadlines', JSON.stringify(deadlines));
+
+      toast({
+        title: 'Milestone Added to Calendar',
+        description: `"${milestone.task}" has been added to your deadline calendar.`,
+      });
+    } catch (error) {
+       console.error('Error adding to calendar:', error);
+       toast({
+        title: 'Failed to Add',
+        description: 'Could not add the milestone to the calendar. Please check the date format.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -197,7 +238,7 @@ export default function TimelineGeneratorPage() {
                   timeline.milestones.map((milestone, index) => (
                     <div
                       key={index}
-                      className="flex justify-between items-center p-3 bg-muted rounded-md"
+                      className="flex justify-between items-center p-3 bg-muted/50 rounded-md"
                     >
                       <div>
                         <p className="font-semibold">{milestone.date}</p>
@@ -205,7 +246,7 @@ export default function TimelineGeneratorPage() {
                           {milestone.task}
                         </p>
                       </div>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" onClick={() => handleAddToCalendar(milestone)}>
                         <PlusCircle className="mr-2 h-4 w-4" />
                         Add to Calendar
                       </Button>
