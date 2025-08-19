@@ -159,10 +159,14 @@ function ApplicationRow({
   application,
   onUpdate,
   onTaskUpdate,
+  onTaskAdd,
+  onTaskDelete,
 }: {
   application: Application;
   onUpdate: (id: string, data: Partial<ApplicationData>) => void;
   onTaskUpdate: (appId: string, taskId: string, data: Partial<ApplicationTask>) => void;
+  onTaskAdd: (appId: string, task: Omit<ApplicationTask, 'id'>) => void;
+  onTaskDelete: (appId: string, taskId: string) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const Icon = typeIcons[application.type];
@@ -180,8 +184,9 @@ function ApplicationRow({
   const handleAddTask = async () => {
     if (!user || !newTaskText.trim()) return;
     try {
-      await addTaskToApplication(user.uid, application.id, { text: newTaskText, completed: false });
-      onTaskUpdate(application.id, 'new', { text: newTaskText, completed: false });
+      const newTask = { text: newTaskText, completed: false };
+      const newTaskId = await addTaskToApplication(user.uid, application.id, newTask);
+      onTaskAdd(application.id, { id: newTaskId, ...newTask }); // Update parent state
       setNewTaskText('');
     } catch (error) {
       console.error("Failed to add task:", error);
@@ -192,12 +197,12 @@ function ApplicationRow({
       });
     }
   };
-
+  
   const handleDeleteTask = async (taskId: string) => {
     if (!user) return;
     try {
       await deleteApplicationTask(user.uid, application.id, taskId);
-      onTaskUpdate(application.id, taskId, { deleted: true }); // Use a special flag for optimistic update
+      onTaskDelete(application.id, taskId); // Update parent state
     } catch (error) {
       console.error("Failed to delete task:", error);
       toast({
@@ -207,6 +212,22 @@ function ApplicationRow({
       });
     }
   };
+
+  const handleTaskCheckedChange = async (taskId: string, completed: boolean) => {
+     if (!user) return;
+     try {
+       await updateApplicationTask(user.uid, application.id, taskId, { completed });
+       onTaskUpdate(application.id, taskId, { completed });
+     } catch (error) {
+        console.error("Failed to update task:", error);
+        toast({
+            title: "Update Failed",
+            description: "Could not update the task. Please try again.",
+            variant: "destructive",
+        });
+     }
+  }
+
 
   return (
     <Fragment>
@@ -294,7 +315,7 @@ function ApplicationRow({
                         <Checkbox
                           id={`task-${task.id}`}
                           checked={task.completed}
-                          onCheckedChange={(checked) => onTaskUpdate(application.id, task.id, { completed: !!checked })}
+                          onCheckedChange={(checked) => handleTaskCheckedChange(task.id, !!checked)}
                         />
                         <label htmlFor={`task-${task.id}`} className={`flex-1 text-sm ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
                           {task.text}
@@ -387,30 +408,30 @@ export default function DashboardPage() {
     }
   };
 
-  const handleTaskUpdate = async (appId: string, taskId: string, data: any) => {
-    if (!user) return;
-
+  const handleTaskAdd = (appId: string, newTask: ApplicationTask) => {
     setApplications(prevApps => prevApps.map(app => {
       if (app.id !== appId) return app;
-
-      let newTasks;
-      if (data.deleted) {
-        newTasks = app.tasks?.filter(t => t.id !== taskId);
-      } else if (taskId === 'new') {
-        newTasks = [...(app.tasks || []), { id: `temp-${Date.now()}`, ...data }];
-      } else {
-        newTasks = app.tasks?.map(t => t.id === taskId ? { ...t, ...data } : t);
-      }
-      
-      return { ...app, tasks: newTasks };
+      const updatedTasks = [...(app.tasks || []), newTask];
+      return { ...app, tasks: updatedTasks };
     }));
-
-    if (taskId === 'new') {
-       // Refresh from DB to get the real new task
-      const userApps = await getApplications(user.uid);
-      setApplications(userApps);
-    }
   };
+
+  const handleTaskUpdate = (appId: string, taskId: string, data: Partial<ApplicationTask>) => {
+    setApplications(prevApps => prevApps.map(app => {
+      if (app.id !== appId) return app;
+      const updatedTasks = app.tasks?.map(t => t.id === taskId ? { ...t, ...data } : t);
+      return { ...app, tasks: updatedTasks };
+    }));
+  };
+
+  const handleTaskDelete = (appId: string, taskId: string) => {
+    setApplications(prevApps => prevApps.map(app => {
+        if (app.id !== appId) return app;
+        const updatedTasks = app.tasks?.filter(t => t.id !== taskId);
+        return { ...app, tasks: updatedTasks };
+    }));
+  };
+
 
   const handleAddCollege = async (values: z.infer<typeof addApplicationSchema>) => {
     if (!user) return;
@@ -582,7 +603,9 @@ export default function DashboardPage() {
                     key={app.id}
                     application={app}
                     onUpdate={handleUpdate}
+                    onTaskAdd={handleTaskAdd}
                     onTaskUpdate={handleTaskUpdate}
+                    onTaskDelete={handleTaskDelete}
                   />
                 ))}
               </TableBody>
@@ -593,4 +616,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

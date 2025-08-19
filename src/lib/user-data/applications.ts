@@ -19,6 +19,7 @@ export interface ApplicationTask {
   id: string;
   text: string;
   completed: boolean;
+  deleted?: boolean;
 }
 
 export interface Application {
@@ -37,22 +38,37 @@ export type ApplicationTaskData = Omit<ApplicationTask, 'id'>;
 
 // Function to get all applications for a user, including their tasks
 export const getApplications = async (userId: string): Promise<Application[]> => {
+  // Step 1: Fetch all applications
   const appsQuery = query(collection(db, `users/${userId}/applications`));
   const appsSnapshot = await getDocs(appsQuery);
+  const applications: Record<string, Application> = {};
+  
+  appsSnapshot.docs.forEach(doc => {
+    applications[doc.id] = { id: doc.id, ...doc.data(), tasks: [] } as Application;
+  });
 
-  const applications = await Promise.all(
-    appsSnapshot.docs.map(async (appDoc) => {
-      const application: Application = { id: appDoc.id, ...appDoc.data() } as Application;
-      
-      const tasksQuery = query(collection(db, `users/${userId}/applications/${appDoc.id}/tasks`));
-      const tasksSnapshot = await getDocs(tasksQuery);
-      application.tasks = tasksSnapshot.docs.map(taskDoc => ({ id: taskDoc.id, ...taskDoc.data() } as ApplicationTask));
-      
-      return application;
-    })
+  // Step 2: Fetch all tasks for the user in a single collectionGroup query
+  const tasksQuery = query(
+    collectionGroup(db, 'tasks'),
+    where('__name__', '>=', `users/${userId}/applications/`),
+    where('__name__', '<', `users/${userId}/applications0`)
   );
   
-  return applications.sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
+  const tasksSnapshot = await getDocs(tasksQuery);
+
+  // Step 3: Match tasks to their parent applications
+  tasksSnapshot.forEach(taskDoc => {
+    const pathSegments = taskDoc.ref.path.split('/');
+    // path is users/{userId}/applications/{appId}/tasks/{taskId}
+    const appId = pathSegments[3];
+    if (applications[appId]) {
+      applications[appId].tasks?.push({ id: taskDoc.id, ...taskDoc.data() } as ApplicationTask);
+    }
+  });
+
+  const applicationsArray = Object.values(applications);
+  
+  return applicationsArray.sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
 };
 
 
