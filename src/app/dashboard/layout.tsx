@@ -15,42 +15,42 @@ export default function DashboardLayout({
 }) {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [status, setStatus] = useState<'loading' | 'onboarding' | 'authorized'>('loading');
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
     if (authLoading) {
-      return; // Wait for firebase auth to initialize
+      return; // Wait for firebase auth to finish initializing
     }
 
     if (!user) {
+      // If auth is done and there's no user, redirect to login
       router.push('/login');
       return;
     }
 
-    // If we have a user, we need to check if they have completed onboarding
-    const checkProfile = async () => {
+    // If there is a user, check their onboarding status
+    const checkOnboardingStatus = async () => {
       try {
         const profile = await getUserProfile(user.uid);
         if (profile?.onboardingComplete) {
-          setStatus('authorized');
+          setIsAuthorized(true);
         } else {
-          // This will redirect them to onboarding, and we'll wait there.
-          setStatus('onboarding');
+          // User exists but hasn't completed onboarding
           router.push('/onboarding');
         }
       } catch (error) {
-        console.error("Failed to check user profile, logging out.", error);
-        // If rules are bad or something else happens, push to login.
+        console.error('Failed to get user profile, redirecting to login.', error);
         router.push('/login');
       }
     };
 
-    checkProfile();
+    checkOnboardingStatus();
   }, [user, authLoading, router]);
 
-  if (status !== 'authorized') {
+  if (!isAuthorized) {
+    // Show a loading spinner while we're verifying auth and onboarding status
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
