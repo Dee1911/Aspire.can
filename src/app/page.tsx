@@ -2,7 +2,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Compass, Target, Calculator, FileClock, GraduationCap, DollarSign, Lightbulb } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -155,7 +155,7 @@ export default function LandingPage() {
                           If you&apos;ve ever tried figuring out the Canadian university process, you know how frustrating it is. Everything online talks about SATs and Common Apps, but when it comes to Ontario or BC or anywhere else in Canada, you&apos;re left piecing it all together yourself.
                         </p>
                          <p className="max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                           That&apos;s why Aspire exists. It&apos;s built by Canadian students, for Canadian students. It's your personalized companion through the university application process. Thoughtfully made for Canada. Designed to make the path clearer. Inspired by students like you.
+                           That&apos;s why Aspire exists. It&apos;s built by Canadian students, for Canadian students. It&apos;s your personalized companion through the university application process. Thoughtfully made for Canada. Designed to make the path clearer. Inspired by students like you.
                         </p>
                     </div>
                 </div>
