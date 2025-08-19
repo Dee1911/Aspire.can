@@ -27,6 +27,7 @@ import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import type { FirebaseError } from 'firebase/app';
 
 
 const formSchema = z.object({
@@ -53,11 +54,20 @@ export default function SignupPage() {
       router.push('/dashboard');
     } catch (error) {
       console.error('Failed to sign up:', error);
-       toast({
-        title: 'Signup Failed',
-        description: 'Could not create an account. Please try again.',
-        variant: 'destructive',
-      });
+      const firebaseError = error as FirebaseError;
+      if (firebaseError.code === 'auth/email-already-in-use') {
+         toast({
+          title: 'Signup Failed',
+          description: 'An account with this email already exists. Please login instead.',
+          variant: 'destructive',
+        });
+      } else {
+         toast({
+          title: 'Signup Failed',
+          description: 'Could not create an account. Please try again.',
+          variant: 'destructive',
+        });
+      }
     }
   }
 
