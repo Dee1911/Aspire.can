@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -18,10 +17,19 @@ import {
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, PlusCircle, Save, Trash2 } from 'lucide-react';
+import { Loader2, PlusCircle, Save, Sparkles, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
-import { getStoryBuilderData, saveStoryBuilderData, StoryBuilderData, ExtracurricularStory } from '@/lib/user-data/story-builder';
+import {
+  getStoryBuilderData,
+  saveStoryBuilderData,
+  StoryBuilderData,
+  ExtracurricularStory,
+} from '@/lib/user-data/story-builder';
+import {
+  suggestEcImpact,
+  SuggestEcImpactOutput,
+} from '@/ai/flows/ec-impact-suggester-flow';
 import { Input } from '@/components/ui/input';
 
 export default function StoryBuilderPage() {
@@ -30,6 +38,9 @@ export default function StoryBuilderPage() {
   const [narrative, setNarrative] = useState<StoryBuilderData>({ ecs: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSuggestingImpact, setIsSuggestingImpact] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
     if (user) {
@@ -38,7 +49,10 @@ export default function StoryBuilderPage() {
         const data = await getStoryBuilderData(user.uid);
         if (data) {
           // ensure 'ecs' is an array, if not, initialize it
-          setNarrative({ ...data, ecs: Array.isArray(data.ecs) ? data.ecs : [] });
+          setNarrative({
+            ...data,
+            ecs: Array.isArray(data.ecs) ? data.ecs : [],
+          });
         }
         setIsLoading(false);
       };
@@ -48,7 +62,7 @@ export default function StoryBuilderPage() {
 
   const handleSave = async () => {
     if (!user) {
-       toast({
+      toast({
         title: 'Please log in',
         description: 'You need to be logged in to save your narrative.',
         variant: 'destructive',
@@ -63,23 +77,67 @@ export default function StoryBuilderPage() {
         description: 'Your story has been successfully saved.',
       });
     } catch (error) {
-      console.error("Failed to save narrative:", error);
+      console.error('Failed to save narrative:', error);
       toast({
-        title: "Save Failed",
-        description: "Could not save your story. Please try again.",
-        variant: "destructive",
+        title: 'Save Failed',
+        description: 'Could not save your story. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleInputChange = (field: keyof StoryBuilderData, value: string) => {
-    setNarrative(prev => ({ ...prev, [field]: value }));
+  const handleSuggestImpact = async (index: number) => {
+    const ec = (narrative.ecs || [])[index];
+    if (!ec || !ec.name || !ec.story) {
+      toast({
+        title: 'Missing Information',
+        description:
+          'Please provide an activity name and a brief story to get suggestions.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsSuggestingImpact(index);
+    try {
+      const result = await suggestEcImpact({
+        activityName: ec.name,
+        activityDescription: ec.story,
+      });
+
+      const suggestionsText = result.suggestions.join('\n');
+      const currentImpact = ec.impact ? `${ec.impact}\n` : '';
+      handleEcChange(index, 'impact', currentImpact + suggestionsText);
+
+      toast({
+        title: 'Suggestions Added',
+        description:
+          'AI-powered impact statements have been added to your activity.',
+      });
+    } catch (error) {
+      console.error('Failed to suggest impact:', error);
+      toast({
+        title: 'Suggestion Failed',
+        description: 'Could not generate suggestions. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSuggestingImpact(null);
+    }
   };
 
-  const handleEcChange = (index: number, field: keyof ExtracurricularStory, value: string) => {
-    setNarrative(prev => {
+  const handleInputChange = (field: keyof StoryBuilderData, value: string) => {
+    setNarrative((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleEcChange = (
+    index: number,
+    field: keyof ExtracurricularStory,
+    value: string
+  ) => {
+    setNarrative((prev) => {
       const newEcs = [...(prev.ecs || [])];
       newEcs[index] = { ...newEcs[index], [field]: value };
       return { ...prev, ecs: newEcs };
@@ -87,14 +145,14 @@ export default function StoryBuilderPage() {
   };
 
   const addEc = () => {
-    setNarrative(prev => ({
+    setNarrative((prev) => ({
       ...prev,
       ecs: [...(prev.ecs || []), { id: `ec-${Date.now()}` }],
     }));
   };
-  
+
   const removeEc = (index: number) => {
-    setNarrative(prev => ({
+    setNarrative((prev) => ({
       ...prev,
       ecs: (prev.ecs || []).filter((_, i) => i !== index),
     }));
@@ -102,7 +160,7 @@ export default function StoryBuilderPage() {
 
   if (isLoading) {
     return (
-       <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-full">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -115,11 +173,15 @@ export default function StoryBuilderPage() {
           <h1 className="text-3xl font-headline font-bold">Story Builder</h1>
           <p className="text-muted-foreground max-w-2xl mt-1">
             Compose your personal narrative. This content will be used by the AI
-            Essay Tool to help you write compelling essays.
+            Essay Tool and Scholarship Matchmaker.
           </p>
         </div>
         <Button className="shrink-0" onClick={handleSave} disabled={isSaving}>
-          {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+          {isSaving ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Save className="mr-2 h-4 w-4" />
+          )}
           Save Narrative
         </Button>
       </header>
@@ -142,48 +204,93 @@ export default function StoryBuilderPage() {
         </CardContent>
       </Card>
 
-      <Accordion type="multiple" className="w-full space-y-4" defaultValue={['item-1']}>
+      <Accordion
+        type="multiple"
+        className="w-full space-y-4"
+        defaultValue={['item-1']}
+      >
         <AccordionItem value="item-1" className="border rounded-lg bg-card">
           <AccordionTrigger className="p-4 font-semibold hover:no-underline">
             Extracurriculars & Experiences
           </AccordionTrigger>
           <AccordionContent className="p-4 pt-0">
-             <div className="space-y-4">
-                {(narrative.ecs || []).map((ec, index) => (
-                    <Card key={ec.id || index} className="p-4 bg-muted/50">
-                        <div className="flex justify-end">
-                            <Button variant="ghost" size="icon" onClick={() => removeEc(index)}>
-                                <Trash2 className="h-4 w-4 text-destructive" />
+            <div className="space-y-4">
+              {(narrative.ecs || []).map((ec, index) => (
+                <Card key={ec.id || index} className="p-4 bg-muted/50">
+                  <div className="flex justify-end -mt-2 -mr-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeEc(index)}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Activity Name</Label>
+                      <Input
+                        placeholder="e.g., DECA Club"
+                        value={ec.name || ''}
+                        onChange={(e) =>
+                          handleEcChange(index, 'name', e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Your Role</Label>
+                      <Input
+                        placeholder="e.g., President"
+                        value={ec.role || ''}
+                        onChange={(e) =>
+                          handleEcChange(index, 'role', e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="md:col-span-2 space-y-2">
+                      <Label>A Brief Story</Label>
+                      <Textarea
+                        placeholder="Tell a short story about a specific experience, challenge, or what you did."
+                        value={ec.story || ''}
+                        onChange={(e) =>
+                          handleEcChange(index, 'story', e.target.value)
+                        }
+                      />
+                    </div>
+                     <div className="md:col-span-2 space-y-2">
+                        <div className="flex items-center justify-between">
+                            <Label>Impact & Achievements</Label>
+                             <Button size="sm" variant="outline" onClick={() => handleSuggestImpact(index)} disabled={isSuggestingImpact === index}>
+                                {isSuggestingImpact === index ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                                Suggest Impact
                             </Button>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label>Activity Name</Label>
-                                <Input placeholder="e.g., DECA Club" value={ec.name || ''} onChange={e => handleEcChange(index, 'name', e.target.value)} />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Your Role</Label>
-                                <Input placeholder="e.g., President" value={ec.role || ''} onChange={e => handleEcChange(index, 'role', e.target.value)} />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Quantitative Impact</Label>
-                                <Input placeholder="e.g., Raised $1500, led a team of 12" value={ec.impact || ''} onChange={e => handleEcChange(index, 'impact', e.target.value)} />
-                            </div>
-                             <div className="space-y-2">
-                                <Label>Skills Learned</Label>
-                                <Input placeholder="e.g., Public Speaking, Project Management" value={ec.skills || ''} onChange={e => handleEcChange(index, 'skills', e.target.value)} />
-                            </div>
-                             <div className="md:col-span-2 space-y-2">
-                                <Label>A Brief Story</Label>
-                                <Textarea placeholder="Tell a short story about a specific experience or challenge." value={ec.story || ''} onChange={e => handleEcChange(index, 'story', e.target.value)} />
-                            </div>
-                        </div>
-                    </Card>
-                ))}
-                <Button variant="outline" onClick={addEc}>
-                    <PlusCircle className="mr-2 h-4 w-4"/> Add Activity
-                </Button>
-             </div>
+                      <Textarea
+                        placeholder="e.g., Raised $1500, led a team of 12, or click 'Suggest Impact' for AI help."
+                        rows={4}
+                        value={ec.impact || ''}
+                        onChange={(e) =>
+                          handleEcChange(index, 'impact', e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="md:col-span-2 space-y-2">
+                      <Label>Skills Learned</Label>
+                      <Input
+                        placeholder="e.g., Public Speaking, Project Management, Python"
+                        value={ec.skills || ''}
+                        onChange={(e) =>
+                          handleEcChange(index, 'skills', e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+                </Card>
+              ))}
+              <Button variant="outline" onClick={addEc}>
+                <PlusCircle className="mr-2 h-4 w-4" /> Add Activity
+              </Button>
+            </div>
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-2" className="border rounded-lg bg-card">
@@ -200,7 +307,9 @@ export default function StoryBuilderPage() {
               placeholder="e.g., Won 1st place at the National Science Fair..."
               rows={5}
               value={narrative.achievements || ''}
-              onChange={(e) => handleInputChange('achievements', e.target.value)}
+              onChange={(e) =>
+                handleInputChange('achievements', e.target.value)
+              }
             />
           </AccordionContent>
         </AccordionItem>
