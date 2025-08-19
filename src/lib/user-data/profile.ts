@@ -22,6 +22,10 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
   if (docSnap.exists()) {
     return docSnap.data() as UserProfile;
   } else {
-    return null;
+    // To support the new, more efficient query in applications.ts, a user doc must exist.
+    // Create it if it doesn't.
+    await setDoc(docRef, { onboardingComplete: false });
+    const newDocSnap = await getDoc(docRef);
+    return newDocSnap.data() as UserProfile;
   }
 };
