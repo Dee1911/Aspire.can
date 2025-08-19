@@ -42,14 +42,18 @@ import {
   Shield,
   FileClock,
   Calculator,
+  Loader2,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-
+import { useAuth } from '@/hooks/use-auth';
+import { getApplications, addApplication, updateApplication, Application, ApplicationData } from '@/lib/user-data/applications';
+import { addDeadline } from '@/lib/user-data/deadlines';
+import { useToast } from '@/hooks/use-toast';
 
 export type ApplicationType = 'Reach' | 'Target' | 'Safety';
 export type ApplicationProgress =
@@ -57,52 +61,6 @@ export type ApplicationProgress =
   | 'In Progress'
   | 'Applied'
   | 'Completed';
-
-export interface Application {
-  id: number;
-  name: string;
-  deadline: string;
-  type: ApplicationType;
-  progress: ApplicationProgress;
-}
-
-const initialApplications: Application[] = [
-  {
-    id: 1,
-    name: 'University of Toronto - Commerce (Rotman)',
-    deadline: '2025-01-15',
-    type: 'Target',
-    progress: 'Not Started',
-  },
-  {
-    id: 2,
-    name: 'University of Waterloo - Software Engineering',
-    deadline: '2025-02-01',
-    type: 'Reach',
-    progress: 'In Progress',
-  },
-  {
-    id: 3,
-    name: "Queen's University - Commerce",
-    deadline: '2025-02-15',
-    type: 'Target',
-    progress: 'Applied',
-  },
-  {
-    id: 4,
-    name: 'Western University - Business (Ivey AEO)',
-    deadline: '2025-01-15',
-    type: 'Target',
-    progress: 'Completed',
-  },
-  {
-    id: 5,
-    name: 'York University - Business Administration',
-    deadline: '2025-03-01',
-    type: 'Safety',
-    progress: 'Not Started',
-  },
-];
 
 const shortcutCards = [
   {
@@ -184,7 +142,7 @@ function ApplicationRow({
   onUpdate,
 }: {
   application: Application;
-  onUpdate: (id: number, field: keyof Application, value: any) => void;
+  onUpdate: (id: string, field: keyof Application, value: any) => void;
 }) {
   const Icon = typeIcons[application.type];
   const color = typeColors[application.type];
@@ -259,10 +217,12 @@ function ApplicationRow({
 }
 
 export default function DashboardPage() {
-  const [applications, setApplications] =
-    useState<Application[]>(initialApplications);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
-  
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
+  const { toast } = useToast();
+
   const form = useForm<z.infer<typeof addApplicationSchema>>({
     resolver: zodResolver(addApplicationSchema),
     defaultValues: {
@@ -272,29 +232,80 @@ export default function DashboardPage() {
     },
   });
 
-  const handleUpdate = (
-    id: number,
+  useEffect(() => {
+    if (user) {
+      const fetchApps = async () => {
+        setIsLoading(true);
+        const userApps = await getApplications(user.uid);
+        setApplications(userApps);
+        setIsLoading(false);
+      };
+      fetchApps();
+    }
+  }, [user]);
+
+  const handleUpdate = async (
+    id: string,
     field: keyof Application,
     value: any
   ) => {
-    setApplications(
-      applications.map(app =>
-        app.id === id ? { ...app, [field]: value } : app
-      )
+    if (!user) return;
+    const optimisticApps = applications.map(app =>
+      app.id === id ? { ...app, [field]: value } : app
     );
+    setApplications(optimisticApps);
+
+    try {
+      await updateApplication(user.uid, id, { [field]: value });
+    } catch (error) {
+      console.error("Failed to update application:", error);
+      toast({
+        title: "Update Failed",
+        description: "Could not save your changes. Please try again.",
+        variant: "destructive",
+      });
+      // Revert optimistic update
+      const userApps = await getApplications(user.uid);
+      setApplications(userApps);
+    }
   };
 
-  const handleAddCollege = (values: z.infer<typeof addApplicationSchema>) => {
-    const newApp: Application = {
-      id: Date.now(),
+  const handleAddCollege = async (values: z.infer<typeof addApplicationSchema>) => {
+    if (!user) return;
+
+    const newAppData: ApplicationData = {
       name: values.name,
       deadline: values.deadline,
       type: values.type as ApplicationType,
       progress: 'Not Started',
     };
-    setApplications([newApp, ...applications]);
-    setAddDialogOpen(false);
-    form.reset();
+
+    try {
+      const newAppId = await addApplication(user.uid, newAppData);
+      setApplications([{ id: newAppId, ...newAppData }, ...applications]);
+
+      // Add corresponding deadline to calendar
+      await addDeadline(user.uid, {
+        name: values.name,
+        date: values.deadline,
+        type: 'Program',
+        sourceId: newAppId
+      });
+
+      setAddDialogOpen(false);
+      form.reset();
+      toast({
+        title: "Application Added",
+        description: `${values.name} has been added to your tracker.`,
+      });
+    } catch (error) {
+      console.error("Failed to add application:", error);
+      toast({
+        title: "Add Failed",
+        description: "Could not add the application. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -405,25 +416,31 @@ export default function DashboardPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[40%]">College Name</TableHead>
-                <TableHead>Deadline</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Progress</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {applications.map(app => (
-                <ApplicationRow
-                  key={app.id}
-                  application={app}
-                  onUpdate={handleUpdate}
-                />
-              ))}
-            </TableBody>
-          </Table>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-40">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[40%]">College Name</TableHead>
+                  <TableHead>Deadline</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Progress</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {applications.map(app => (
+                  <ApplicationRow
+                    key={app.id}
+                    application={app}
+                    onUpdate={handleUpdate}
+                  />
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

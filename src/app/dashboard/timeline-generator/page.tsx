@@ -37,6 +37,8 @@ import {
 } from '@/ai/flows/timeline-generator-flow';
 import { Loader2, PlusCircle, Sparkles } from 'lucide-react';
 import { format, parse } from 'date-fns';
+import { useAuth } from '@/hooks/use-auth';
+import { addDeadline, DeadlineData } from '@/lib/user-data/deadlines';
 
 const formSchema = z.object({
   grade: z.string().min(1, 'Please select your grade.'),
@@ -44,17 +46,11 @@ const formSchema = z.object({
   universities: z.string().min(1, 'Please list your target universities.'),
 });
 
-interface Deadline {
-  date: string;
-  name: string;
-  type: 'Program' | 'Scholarship' | 'Task';
-}
-
-
 export default function TimelineGeneratorPage() {
   const [timeline, setTimeline] = useState<GenerateTimelineOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -65,25 +61,28 @@ export default function TimelineGeneratorPage() {
     },
   });
 
-  const handleAddToCalendar = (milestone: Milestone) => {
+  const handleAddToCalendar = async (milestone: Milestone) => {
+    if (!user) {
+      toast({
+        title: 'Please log in',
+        description: 'You need to be logged in to add tasks to your calendar.',
+        variant: 'destructive',
+      });
+      return;
+    }
     try {
       const parsedDate = parse(milestone.date, 'MMMM yyyy', new Date());
       if (isNaN(parsedDate.getTime())) {
-        throw new Error('Invalid date format');
+        throw new Error('Invalid date format from AI');
       }
       
-      const newDeadline: Deadline = {
+      const newDeadline: DeadlineData = {
         date: format(parsedDate, 'yyyy-MM-dd'),
         name: milestone.task,
         type: 'Task',
       };
 
-      const savedDeadlines = localStorage.getItem('deadlines');
-      const deadlines: Deadline[] = savedDeadlines ? JSON.parse(savedDeadlines) : [];
-      
-      deadlines.push(newDeadline);
-
-      localStorage.setItem('deadlines', JSON.stringify(deadlines));
+      await addDeadline(user.uid, newDeadline);
 
       toast({
         title: 'Milestone Added to Calendar',
@@ -93,7 +92,7 @@ export default function TimelineGeneratorPage() {
        console.error('Error adding to calendar:', error);
        toast({
         title: 'Failed to Add',
-        description: 'Could not add the milestone to the calendar. Please check the date format.',
+        description: 'Could not add the milestone to the calendar. The date format from the AI might be incorrect.',
         variant: 'destructive',
       });
     }

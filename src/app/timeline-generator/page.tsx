@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -35,7 +36,7 @@ import {
   Milestone,
 } from '@/ai/flows/timeline-generator-flow';
 import { Loader2, PlusCircle, Sparkles } from 'lucide-react';
-import { format, parse } from 'date-fns';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   grade: z.string().min(1, 'Please select your grade.'),
@@ -43,17 +44,12 @@ const formSchema = z.object({
   universities: z.string().min(1, 'Please list your target universities.'),
 });
 
-interface Deadline {
-  date: string;
-  name: string;
-  type: 'Program' | 'Scholarship' | 'Task';
-}
-
-
 export default function TimelineGeneratorPage() {
   const [timeline, setTimeline] = useState<GenerateTimelineOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -65,37 +61,11 @@ export default function TimelineGeneratorPage() {
   });
 
   const handleAddToCalendar = (milestone: Milestone) => {
-    try {
-      const parsedDate = parse(milestone.date, 'MMMM yyyy', new Date());
-      if (isNaN(parsedDate.getTime())) {
-        throw new Error('Invalid date format');
-      }
-      
-      const newDeadline: Deadline = {
-        date: format(parsedDate, 'yyyy-MM-dd'),
-        name: milestone.task,
-        type: 'Task',
-      };
-
-      const savedDeadlines = localStorage.getItem('deadlines');
-      const deadlines: Deadline[] = savedDeadlines ? JSON.parse(savedDeadlines) : [];
-      
-      deadlines.push(newDeadline);
-
-      localStorage.setItem('deadlines', JSON.stringify(deadlines));
-
-      toast({
-        title: 'Milestone Added to Calendar',
-        description: `"${milestone.task}" has been added to your deadline calendar.`,
-      });
-    } catch (error) {
-       console.error('Error adding to calendar:', error);
-       toast({
-        title: 'Failed to Add',
-        description: 'Could not add the milestone to the calendar. Please check the date format.',
-        variant: 'destructive',
-      });
-    }
+    toast({
+        title: 'Please log in',
+        description: 'You need to be logged in to add tasks to your calendar.',
+    });
+    router.push('/login');
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {

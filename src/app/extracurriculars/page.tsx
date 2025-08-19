@@ -16,7 +16,6 @@ import { BookOpen, Search } from 'lucide-react';
 import Image from 'next/image';
 import {
   activities,
-  ExtracurricularActivity,
 } from '@/lib/extracurriculars-data';
 import { Input } from '@/components/ui/input';
 import {
@@ -26,6 +25,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 const provinces = [
   ...new Set(activities.map(activity => activity.province)),
@@ -38,6 +39,9 @@ export default function ExtracurricularsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [provinceFilter, setProvinceFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const { toast } = useToast();
+  const router = useRouter();
+
 
   const filteredActivities = useMemo(() => {
     return activities.filter(activity => {
@@ -55,6 +59,15 @@ export default function ExtracurricularsPage() {
       return searchTermMatch && provinceMatch && categoryMatch;
     });
   }, [searchTerm, provinceFilter, categoryFilter]);
+  
+  const handleAddToStoryBuilder = () => {
+    toast({
+      title: 'Please log in',
+      description: 'Log in to add activities to your Story Builder.',
+    });
+    router.push('/login');
+  };
+
 
   return (
     <div className="space-y-6">
@@ -132,7 +145,11 @@ export default function ExtracurricularsPage() {
               </CardDescription>
             </CardContent>
             <CardFooter className="p-4 pt-0">
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={handleAddToStoryBuilder}
+                >
                 <BookOpen className="mr-2 h-4 w-4" />
                 Add to Story Builder
               </Button>
@@ -143,3 +160,4 @@ export default function ExtracurricularsPage() {
     </div>
   );
 }
+

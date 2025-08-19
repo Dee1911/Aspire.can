@@ -17,6 +17,9 @@ import { analyzeEssay, AnalyzeEssayOutput } from '@/ai/flows/essay-feedback';
 import { improveEssay } from '@/ai/flows/improve-essay';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/hooks/use-auth';
+import { getStoryBuilderData } from '@/lib/user-data/story-builder';
+
 
 export default function EssayToolPage() {
   const [essayPrompt, setEssayPrompt] = useState('');
@@ -26,7 +29,10 @@ export default function EssayToolPage() {
   const [improvedEssay, setImprovedEssay] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isImproving, setIsImproving] = useState(false);
+  const [isLoadingNarrative, setIsLoadingNarrative] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+
 
   const handleAnalyze = async () => {
     if (!essayDraft) {
@@ -100,22 +106,51 @@ export default function EssayToolPage() {
     }
   };
   
-  const handleLoadNarrative = () => {
-    const savedNarrative = localStorage.getItem('storyBuilderNarrative');
-    if (savedNarrative) {
-      setStoryContext(savedNarrative);
+  const handleLoadNarrative = async () => {
+    if (!user) {
       toast({
-        title: 'Narrative Loaded',
-        description: 'Your story has been loaded from the Story Builder.',
-      });
-    } else {
-      toast({
-        title: 'No Narrative Found',
-        description: 'Please save your story in the Story Builder first.',
+        title: 'Please log in',
+        description: 'You must be logged in to load your narrative.',
         variant: 'destructive',
       });
+      return;
+    }
+    setIsLoadingNarrative(true);
+    try {
+      const data = await getStoryBuilderData(user.uid);
+      if (data) {
+        const combinedNarrative = [
+          `Personal Story: ${data.personalStory || ''}`,
+          `Extracurriculars: ${data.ecs || ''}`,
+          `Achievements: ${data.achievements || ''}`,
+          `Grades: ${data.grades || ''}`,
+          `Struggles & Growth: ${data.struggles || ''}`,
+          `Skills: ${data.skills || ''}`
+        ].join('\n\n');
+        setStoryContext(combinedNarrative);
+        toast({
+          title: 'Narrative Loaded',
+          description: 'Your story has been loaded from the Story Builder.',
+        });
+      } else {
+        toast({
+          title: 'No Narrative Found',
+          description: 'Please save your story in the Story Builder first.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load narrative:', error);
+       toast({
+        title: 'Load Failed',
+        description: 'Could not load your story. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoadingNarrative(false);
     }
   };
+
 
   const renderFeedbackContent = (text: string) => {
     return text.split('* ').filter(item => item.trim() !== '').map((item, index) => (
@@ -162,8 +197,8 @@ export default function EssayToolPage() {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <Label htmlFor="story-context">Story Builder Narrative</Label>
-                  <Button variant="outline" size="sm" onClick={handleLoadNarrative}>
-                    <Download className="mr-2 h-4 w-4" />
+                  <Button variant="outline" size="sm" onClick={handleLoadNarrative} disabled={isLoadingNarrative}>
+                    {isLoadingNarrative ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
                     Load from Story Builder
                   </Button>
                 </div>

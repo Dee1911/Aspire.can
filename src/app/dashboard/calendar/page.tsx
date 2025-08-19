@@ -5,52 +5,47 @@ import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/hooks/use-auth';
+import { getDeadlines, Deadline } from '@/lib/user-data/deadlines';
+import { Loader2 } from 'lucide-react';
 
-interface Deadline {
-  date: string;
-  name: string;
-  type: 'Program' | 'Scholarship' | 'Task';
-}
-
-const initialDeadlines: Deadline[] = [
-  { date: '2025-01-15', name: 'UofT CompSci Application', type: 'Program' },
-  {
-    date: '2025-01-31',
-    name: 'Schulich Leader Scholarship',
-    type: 'Scholarship',
-  },
-  {
-    date: '2025-02-01',
-    name: 'Waterloo Engineering Application',
-    type: 'Program',
-  },
-  { date: '2024-11-15', name: 'TD Scholarship', type: 'Scholarship' },
-];
 
 export default function CalendarPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [deadlines, setDeadlines] = useState<Deadline[]>(initialDeadlines);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [deadlines, setDeadlines] = useState<Deadline[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
+
 
   useEffect(() => {
-    const savedDeadlines = localStorage.getItem('deadlines');
-    if (savedDeadlines) {
-      setDeadlines(JSON.parse(savedDeadlines));
+    if (user) {
+      const fetchDeadlines = async () => {
+        setIsLoading(true);
+        const userDeadlines = await getDeadlines(user.uid);
+        setDeadlines(userDeadlines);
+        setIsLoading(false);
+      };
+      fetchDeadlines();
     }
-    setIsLoaded(true);
-  }, []);
-  
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem('deadlines', JSON.stringify(deadlines));
-    }
-  }, [deadlines, isLoaded]);
+  }, [user]);
 
 
   const deadlineDates = deadlines.map(d => new Date(d.date + 'T00:00:00'));
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  if (!isLoaded) {
-    return null; // Or a loading spinner
+  const upcomingDeadlines = deadlines
+    .map(d => ({ ...d, dateObj: new Date(d.date + 'T00:00:00') }))
+    .filter(d => d.dateObj >= today)
+    .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
   }
 
   return (
@@ -72,8 +67,8 @@ export default function CalendarPage() {
               modifiers={{ deadlines: deadlineDates }}
               modifiersStyles={{
                 deadlines: {
-                  color: 'hsl(var(--accent-foreground))',
-                  backgroundColor: 'hsl(var(--accent))',
+                  color: 'hsl(var(--destructive-foreground))',
+                  backgroundColor: 'hsl(var(--destructive))',
                 },
               }}
             />
@@ -84,21 +79,17 @@ export default function CalendarPage() {
             <CardTitle>Upcoming Deadlines</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-4">
-              {deadlines
-                .sort(
-                  (a, b) =>
-                    new Date(a.date).getTime() - new Date(b.date).getTime()
-                )
-                .map(deadline => (
+            {upcomingDeadlines.length > 0 ? (
+              <ul className="space-y-4">
+                {upcomingDeadlines.map(deadline => (
                   <li
-                    key={deadline.name}
+                    key={deadline.id}
                     className="flex items-center justify-between"
                   >
                     <div>
                       <p className="font-semibold">{deadline.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {new Date(deadline.date + 'T00:00:00').toLocaleDateString('en-CA', {
+                        {deadline.dateObj.toLocaleDateString('en-CA', {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric',
@@ -116,7 +107,10 @@ export default function CalendarPage() {
                     </Badge>
                   </li>
                 ))}
-            </ul>
+              </ul>
+            ) : (
+               <p className="text-sm text-muted-foreground">No upcoming deadlines.</p>
+            )}
           </CardContent>
         </Card>
       </div>

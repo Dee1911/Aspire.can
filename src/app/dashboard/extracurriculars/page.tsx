@@ -27,6 +27,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
+import { getStoryBuilderData, saveStoryBuilderData } from '@/lib/user-data/story-builder';
+
 
 const provinces = [
   ...new Set(activities.map(activity => activity.province)),
@@ -40,6 +43,8 @@ export default function ExtracurricularsPage() {
   const [provinceFilter, setProvinceFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const { toast } = useToast();
+  const { user } = useAuth();
+
 
   const filteredActivities = useMemo(() => {
     return activities.filter(activity => {
@@ -58,19 +63,34 @@ export default function ExtracurricularsPage() {
     });
   }, [searchTerm, provinceFilter, categoryFilter]);
 
-  const handleAddToStoryBuilder = (activity: ExtracurricularActivity) => {
-    const savedData = localStorage.getItem('storyBuilderData');
-    const data = savedData ? JSON.parse(savedData) : {};
-    const updatedEcs = data.ecs ? `${data.ecs}\n- ${activity.name}` : `- ${activity.name}`;
+  const handleAddToStoryBuilder = async (activity: ExtracurricularActivity) => {
+    if (!user) {
+      toast({
+        title: 'Please log in',
+        description: 'You need to be logged in to save activities.',
+        variant: 'destructive',
+      });
+      return;
+    }
     
-    const narrativeData = { ...data, ecs: updatedEcs };
-    
-    localStorage.setItem('storyBuilderData', JSON.stringify(narrativeData));
+    try {
+      const currentData = await getStoryBuilderData(user.uid);
+      const updatedEcs = currentData?.ecs ? `${currentData.ecs}\n- ${activity.name}` : `- ${activity.name}`;
+      
+      await saveStoryBuilderData(user.uid, { ecs: updatedEcs });
 
-    toast({
-      title: 'Activity Added',
-      description: `"${activity.name}" has been added to your extracurriculars in the Story Builder.`,
-    });
+      toast({
+        title: 'Activity Added',
+        description: `"${activity.name}" has been added to your extracurriculars in the Story Builder.`,
+      });
+    } catch (error) {
+      console.error("Failed to add activity:", error);
+      toast({
+        title: "Save Failed",
+        description: "Could not add the activity to your story. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

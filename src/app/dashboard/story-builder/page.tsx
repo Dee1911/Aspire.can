@@ -18,67 +18,70 @@ import {
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Save } from 'lucide-react';
+import { Loader2, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
+import { getStoryBuilderData, saveStoryBuilderData, StoryBuilderData } from '@/lib/user-data/story-builder';
 
 export default function StoryBuilderPage() {
   const { toast } = useToast();
-  const [personalStory, setPersonalStory] = useState('');
-  const [ecs, setEcs] = useState('');
-  const [achievements, setAchievements] = useState('');
-  const [grades, setGrades] = useState('');
-  const [struggles, setStruggles] = useState('');
-  const [skills, setSkills] = useState('');
-  const [isLoaded, setIsLoaded] = useState(false);
+  const { user } = useAuth();
+  const [narrative, setNarrative] = useState<StoryBuilderData>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    // Load saved data from localStorage when the component mounts
-    const savedData = localStorage.getItem('storyBuilderData');
-    if (savedData) {
-      const data = JSON.parse(savedData);
-      setPersonalStory(data.personalStory || '');
-      setEcs(data.ecs || '');
-      setAchievements(data.achievements || '');
-      setGrades(data.grades || '');
-      setStruggles(data.struggles || '');
-      setSkills(data.skills || '');
+    if (user) {
+      const fetchData = async () => {
+        setIsLoading(true);
+        const data = await getStoryBuilderData(user.uid);
+        if (data) {
+          setNarrative(data);
+        }
+        setIsLoading(false);
+      };
+      fetchData();
     }
-    setIsLoaded(true);
-  }, []);
+  }, [user]);
 
-  const handleSave = () => {
-    const narrativeData = {
-      personalStory,
-      ecs,
-      achievements,
-      grades,
-      struggles,
-      skills,
-    };
-    
-    // Save all fields to a single JSON object in localStorage
-    localStorage.setItem('storyBuilderData', JSON.stringify(narrativeData));
-
-    // Create a combined string for the essay tool
-    const combinedNarrative = [
-      `Personal Story: ${personalStory}`,
-      `Extracurriculars: ${ecs}`,
-      `Achievements: ${achievements}`,
-      `Grades: ${grades}`,
-      `Struggles & Growth: ${struggles}`,
-      `Skills: ${skills}`
-    ].join('\n\n');
-
-    localStorage.setItem('storyBuilderNarrative', combinedNarrative);
-
-    toast({
-      title: 'Narrative Saved',
-      description: 'Your story has been successfully saved to your browser.',
-    });
+  const handleSave = async () => {
+    if (!user) {
+       toast({
+        title: 'Please log in',
+        description: 'You need to be logged in to save your narrative.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setIsSaving(true);
+    try {
+      await saveStoryBuilderData(user.uid, narrative);
+      toast({
+        title: 'Narrative Saved',
+        description: 'Your story has been successfully saved.',
+      });
+    } catch (error) {
+      console.error("Failed to save narrative:", error);
+      toast({
+        title: "Save Failed",
+        description: "Could not save your story. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  if (!isLoaded) {
-      return null; // or a loading spinner
+  const handleInputChange = (field: keyof StoryBuilderData, value: string) => {
+    setNarrative(prev => ({ ...prev, [field]: value }));
+  };
+
+  if (isLoading) {
+    return (
+       <div className="flex items-center justify-center h-full">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
   }
 
   return (
@@ -91,8 +94,8 @@ export default function StoryBuilderPage() {
             Essay Tool to help you write compelling essays.
           </p>
         </div>
-        <Button className="shrink-0" onClick={handleSave}>
-          <Save className="mr-2 h-4 w-4" />
+        <Button className="shrink-0" onClick={handleSave} disabled={isSaving}>
+          {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
           Save Narrative
         </Button>
       </header>
@@ -109,8 +112,8 @@ export default function StoryBuilderPage() {
           <Textarea
             placeholder="Tell your story..."
             rows={10}
-            value={personalStory}
-            onChange={(e) => setPersonalStory(e.target.value)}
+            value={narrative.personalStory || ''}
+            onChange={(e) => handleInputChange('personalStory', e.target.value)}
           />
         </CardContent>
       </Card>
@@ -130,8 +133,8 @@ export default function StoryBuilderPage() {
               className="mt-2"
               placeholder="e.g., President of DECA Club, organized a charity event..."
               rows={5}
-              value={ecs}
-              onChange={(e) => setEcs(e.target.value)}
+              value={narrative.ecs || ''}
+              onChange={(e) => handleInputChange('ecs', e.target.value)}
             />
           </AccordionContent>
         </AccordionItem>
@@ -148,8 +151,8 @@ export default function StoryBuilderPage() {
               className="mt-2"
               placeholder="e.g., Won 1st place at the National Science Fair..."
               rows={5}
-              value={achievements}
-              onChange={(e) => setAchievements(e.target.value)}
+              value={narrative.achievements || ''}
+              onChange={(e) => handleInputChange('achievements', e.target.value)}
             />
           </AccordionContent>
         </AccordionItem>
@@ -167,8 +170,8 @@ export default function StoryBuilderPage() {
               className="mt-2"
               placeholder="e.g., Maintained a 95% average, excelled in Advanced Functions..."
               rows={5}
-              value={grades}
-              onChange={(e) => setGrades(e.target.value)}
+              value={narrative.grades || ''}
+              onChange={(e) => handleInputChange('grades', e.target.value)}
             />
           </AccordionContent>
         </AccordionItem>
@@ -186,8 +189,8 @@ export default function StoryBuilderPage() {
               className="mt-2"
               placeholder="e.g., Overcame public speaking anxiety through debate club..."
               rows={5}
-              value={struggles}
-              onChange={(e) => setStruggles(e.target.value)}
+              value={narrative.struggles || ''}
+              onChange={(e) => handleInputChange('struggles', e.target.value)}
             />
           </AccordionContent>
         </AccordionItem>
@@ -204,8 +207,8 @@ export default function StoryBuilderPage() {
               className="mt-2"
               placeholder="e.g., Proficient in Python, strong leadership and communication skills..."
               rows={5}
-              value={skills}
-              onChange={(e) => setSkills(e.target.value)}
+              value={narrative.skills || ''}
+              onChange={(e) => handleInputChange('skills', e.target.value)}
             />
           </AccordionContent>
         </AccordionItem>
