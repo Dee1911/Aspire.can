@@ -29,6 +29,7 @@ import {
   Calculator,
   User,
   LogOut,
+  HelpCircle,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from './ui/button';
@@ -49,6 +50,7 @@ const navItems = [
   { href: '/dashboard/calendar', icon: Calendar, label: 'Deadlines' },
   { href: '/dashboard/story-builder', icon: BookOpen, label: 'Story Builder' },
   { href: '/dashboard/essay-tool', icon: Sparkles, label: 'AI Essay Tool' },
+  { href: '/dashboard/guide', icon: HelpCircle, label: 'How-To Guide' },
 ];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
