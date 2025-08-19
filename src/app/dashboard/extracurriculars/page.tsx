@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -27,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
 
 const provinces = [
   ...new Set(activities.map(activity => activity.province)),
@@ -39,6 +39,7 @@ export default function ExtracurricularsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [provinceFilter, setProvinceFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const { toast } = useToast();
 
   const filteredActivities = useMemo(() => {
     return activities.filter(activity => {
@@ -56,6 +57,21 @@ export default function ExtracurricularsPage() {
       return searchTermMatch && provinceMatch && categoryMatch;
     });
   }, [searchTerm, provinceFilter, categoryFilter]);
+
+  const handleAddToStoryBuilder = (activity: ExtracurricularActivity) => {
+    const savedData = localStorage.getItem('storyBuilderData');
+    const data = savedData ? JSON.parse(savedData) : {};
+    const updatedEcs = data.ecs ? `${data.ecs}\n- ${activity.name}` : `- ${activity.name}`;
+    
+    const narrativeData = { ...data, ecs: updatedEcs };
+    
+    localStorage.setItem('storyBuilderData', JSON.stringify(narrativeData));
+
+    toast({
+      title: 'Activity Added',
+      description: `"${activity.name}" has been added to your extracurriculars in the Story Builder.`,
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -133,7 +149,11 @@ export default function ExtracurricularsPage() {
               </CardDescription>
             </CardContent>
             <CardFooter className="p-4 pt-0">
-              <Button variant="outline" className="w-full">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => handleAddToStoryBuilder(activity)}
+              >
                 <BookOpen className="mr-2 h-4 w-4" />
                 Add to Story Builder
               </Button>
