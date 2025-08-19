@@ -18,15 +18,16 @@ import {
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, PlusCircle, Save, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
-import { getStoryBuilderData, saveStoryBuilderData, StoryBuilderData } from '@/lib/user-data/story-builder';
+import { getStoryBuilderData, saveStoryBuilderData, StoryBuilderData, ExtracurricularStory } from '@/lib/user-data/story-builder';
+import { Input } from '@/components/ui/input';
 
 export default function StoryBuilderPage() {
   const { toast } = useToast();
   const { user } = useAuth();
-  const [narrative, setNarrative] = useState<StoryBuilderData>({});
+  const [narrative, setNarrative] = useState<StoryBuilderData>({ ecs: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -36,7 +37,8 @@ export default function StoryBuilderPage() {
         setIsLoading(true);
         const data = await getStoryBuilderData(user.uid);
         if (data) {
-          setNarrative(data);
+          // ensure 'ecs' is an array, if not, initialize it
+          setNarrative({ ...data, ecs: Array.isArray(data.ecs) ? data.ecs : [] });
         }
         setIsLoading(false);
       };
@@ -74,6 +76,28 @@ export default function StoryBuilderPage() {
 
   const handleInputChange = (field: keyof StoryBuilderData, value: string) => {
     setNarrative(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleEcChange = (index: number, field: keyof ExtracurricularStory, value: string) => {
+    setNarrative(prev => {
+      const newEcs = [...(prev.ecs || [])];
+      newEcs[index] = { ...newEcs[index], [field]: value };
+      return { ...prev, ecs: newEcs };
+    });
+  };
+
+  const addEc = () => {
+    setNarrative(prev => ({
+      ...prev,
+      ecs: [...(prev.ecs || []), { id: `ec-${Date.now()}` }],
+    }));
+  };
+  
+  const removeEc = (index: number) => {
+    setNarrative(prev => ({
+      ...prev,
+      ecs: (prev.ecs || []).filter((_, i) => i !== index),
+    }));
   };
 
   if (isLoading) {
@@ -124,18 +148,42 @@ export default function StoryBuilderPage() {
             Extracurriculars & Experiences
           </AccordionTrigger>
           <AccordionContent className="p-4 pt-0">
-            <Label htmlFor="ecs">
-              Describe your key extracurricular activities and what you learned
-              from them.
-            </Label>
-            <Textarea
-              id="ecs"
-              className="mt-2"
-              placeholder="e.g., President of DECA Club, organized a charity event..."
-              rows={5}
-              value={narrative.ecs || ''}
-              onChange={(e) => handleInputChange('ecs', e.target.value)}
-            />
+             <div className="space-y-4">
+                {(narrative.ecs || []).map((ec, index) => (
+                    <Card key={ec.id || index} className="p-4 bg-muted/50">
+                        <div className="flex justify-end">
+                            <Button variant="ghost" size="icon" onClick={() => removeEc(index)}>
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>Activity Name</Label>
+                                <Input placeholder="e.g., DECA Club" value={ec.name || ''} onChange={e => handleEcChange(index, 'name', e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Your Role</Label>
+                                <Input placeholder="e.g., President" value={ec.role || ''} onChange={e => handleEcChange(index, 'role', e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Quantitative Impact</Label>
+                                <Input placeholder="e.g., Raised $1500, led a team of 12" value={ec.impact || ''} onChange={e => handleEcChange(index, 'impact', e.target.value)} />
+                            </div>
+                             <div className="space-y-2">
+                                <Label>Skills Learned</Label>
+                                <Input placeholder="e.g., Public Speaking, Project Management" value={ec.skills || ''} onChange={e => handleEcChange(index, 'skills', e.target.value)} />
+                            </div>
+                             <div className="md:col-span-2 space-y-2">
+                                <Label>A Brief Story</Label>
+                                <Textarea placeholder="Tell a short story about a specific experience or challenge." value={ec.story || ''} onChange={e => handleEcChange(index, 'story', e.target.value)} />
+                            </div>
+                        </div>
+                    </Card>
+                ))}
+                <Button variant="outline" onClick={addEc}>
+                    <PlusCircle className="mr-2 h-4 w-4"/> Add Activity
+                </Button>
+             </div>
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-2" className="border rounded-lg bg-card">

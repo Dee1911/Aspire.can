@@ -1,9 +1,18 @@
 import { db } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
+export interface ExtracurricularStory {
+  id: string;
+  name?: string;
+  role?: string;
+  impact?: string;
+  skills?: string;
+  story?: string;
+}
+
 export interface StoryBuilderData {
   personalStory?: string;
-  ecs?: string;
+  ecs?: ExtracurricularStory[];
   achievements?: string;
   grades?: string;
   struggles?: string;
@@ -16,9 +25,22 @@ export const getStoryBuilderData = async (userId: string): Promise<StoryBuilderD
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
-    return docSnap.data() as StoryBuilderData;
+    const data = docSnap.data() as StoryBuilderData;
+    // Ensure ecs is an array
+    if (!Array.isArray(data.ecs)) {
+      data.ecs = [];
+    }
+    return data;
   } else {
-    return null;
+    // Return a default structure if no data exists
+    return {
+      personalStory: '',
+      ecs: [],
+      achievements: '',
+      grades: '',
+      struggles: '',
+      skills: ''
+    };
   }
 };
 
