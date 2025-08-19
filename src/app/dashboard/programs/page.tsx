@@ -21,8 +21,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Save } from 'lucide-react';
-import Image from 'next/image';
 import { programs } from '@/lib/programs-data';
+import { Badge } from '@/components/ui/badge';
 
 const allProvinces = [...new Set(programs.map(p => p.province))].sort();
 const allFaculties = [...new Set(programs.map(p => p.faculty))].sort();
@@ -102,22 +102,27 @@ export default function ProgramsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredPrograms.map(program => (
-          <Card key={program.programName + program.universityName}>
-            <CardHeader className="p-0">
-              <Image
-                src={program.image}
-                alt={program.programName}
-                width={600}
-                height={400}
-                className="rounded-t-lg object-cover aspect-[3/2]"
-                data-ai-hint={program.hint}
-              />
-            </CardHeader>
-            <CardContent className="p-4">
+          <Card key={program.programName + program.universityName} className="flex flex-col">
+            <CardHeader>
               <CardTitle className="font-headline text-xl">
                 {program.programName}
               </CardTitle>
               <CardDescription>{program.universityName}</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1 space-y-2">
+                <p className="text-sm text-muted-foreground">
+                    <strong className="text-foreground">Faculty:</strong> {program.faculty}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                    <strong className="text-foreground">Avg. Requirement:</strong> {program.minGradeAverage}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                    <strong className="text-foreground">Courses:</strong> {program.requiredCourses}
+                </p>
+                 <div className="flex gap-2 pt-1">
+                    {program.coopOption && <Badge variant="secondary">Co-op Available</Badge>}
+                    <Badge variant="outline">{program.province}</Badge>
+                </div>
             </CardContent>
             <CardFooter className="p-4 pt-0">
               <Button className="w-full">

@@ -36,6 +36,7 @@ import { Button } from './ui/button';
 import { Avatar, AvatarFallback } from './ui/avatar';
 
 const navItems = [
+  { href: '/dashboard/guide', icon: HelpCircle, label: 'How-To Guide' },
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/dashboard/program-finder', icon: Target, label: 'AI Program Finder' },
   {
@@ -50,7 +51,6 @@ const navItems = [
   { href: '/dashboard/calendar', icon: Calendar, label: 'Deadlines' },
   { href: '/dashboard/story-builder', icon: BookOpen, label: 'Story Builder' },
   { href: '/dashboard/essay-tool', icon: Sparkles, label: 'AI Essay Tool' },
-  { href: '/dashboard/guide', icon: HelpCircle, label: 'How-To Guide' },
 ];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {

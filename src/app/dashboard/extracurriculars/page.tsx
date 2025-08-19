@@ -12,8 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { BookOpen, Search } from 'lucide-react';
-import Image from 'next/image';
+import { BookOpen } from 'lucide-react';
 import {
   activities,
   ExtracurricularActivity,
@@ -28,7 +27,7 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
-import { getStoryBuilderData, saveStoryBuilderData } from '@/lib/user-data/story-builder';
+import { getStoryBuilderData, saveStoryBuilderData, ExtracurricularStory } from '@/lib/user-data/story-builder';
 
 
 const provinces = [
@@ -75,7 +74,14 @@ export default function ExtracurricularsPage() {
     
     try {
       const currentData = await getStoryBuilderData(user.uid);
-      const updatedEcs = currentData?.ecs ? `${currentData.ecs}\n- ${activity.name}` : `- ${activity.name}`;
+      const newEc: ExtracurricularStory = { 
+        id: `ec-${Date.now()}`,
+        name: activity.name,
+        story: activity.description,
+        skills: activity.skillsGained
+      };
+
+      const updatedEcs = [...(currentData?.ecs || []), newEc];
       
       await saveStoryBuilderData(user.uid, { ecs: updatedEcs });
 
@@ -145,30 +151,25 @@ export default function ExtracurricularsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredActivities.map(activity => (
-          <Card key={activity.name}>
-            <CardHeader className="p-0">
-              <Image
-                src={activity.image}
-                alt={activity.name}
-                width={600}
-                height={400}
-                className="rounded-t-lg object-cover aspect-[3/2]"
-                data-ai-hint={activity.hint}
-              />
-            </CardHeader>
-            <CardContent className="p-4">
-              <div className="flex justify-between items-start mb-2">
-                <Badge variant="secondary">{activity.category}</Badge>
-                <p className="text-xs text-muted-foreground">{activity.province}</p>
+          <Card key={activity.name} className="flex flex-col">
+            <CardHeader>
+              <div className="space-y-2">
+                <div className="flex justify-between items-start">
+                  <Badge variant="secondary">{activity.category}</Badge>
+                  <p className="text-xs text-muted-foreground">{activity.province}</p>
+                </div>
+                <CardTitle className="font-headline text-xl">
+                  {activity.name}
+                </CardTitle>
               </div>
-              <CardTitle className="font-headline text-xl">
-                {activity.name}
-              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1">
               <CardDescription>
-                Gain skills in: {activity.skillsGained}
+                {activity.description}
               </CardDescription>
+               <p className="text-sm mt-3"><strong className="text-foreground">Skills Gained:</strong> {activity.skillsGained}</p>
             </CardContent>
-            <CardFooter className="p-4 pt-0">
+            <CardFooter className="p-4 pt-2">
               <Button
                 variant="outline"
                 className="w-full"

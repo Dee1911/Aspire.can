@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useState } from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -8,67 +9,104 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { BookOpen, BrainCircuit, Calculator, Calendar, DollarSign, FileClock, GraduationCap, HelpCircle, LayoutDashboard, Lightbulb, Sparkles, Target } from 'lucide-react';
+import { BookOpen, BrainCircuit, Calculator, Calendar, DollarSign, FileClock, GraduationCap, HelpCircle, LayoutDashboard, Lightbulb, Loader2, Sparkles, Target } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { recommendFeatures, RecommendFeaturesOutput } from '@/ai/flows/feature-recommender-flow';
 
 const features = [
   {
     title: 'Dashboard',
     icon: LayoutDashboard,
-    description: 'Your central hub for tracking university applications. Add universities, set deadlines, and categorize them as Reach, Target, or Safety to stay organized.'
+    description: 'Your central hub for tracking university applications. The dashboard is your command center for your entire university application journey. Here, you can add all the universities you are interested in applying to. For each university, you can set an application deadline and categorize it as a "Reach" (a long shot, but your dream school), "Target" (you have a good chance of getting in), or "Safety" (you are very likely to be accepted). This helps you stay organized, prioritize your tasks, and visualize your application strategy at a glance.'
   },
   {
     title: 'AI Program Finder',
     icon: Target,
-    description: "Don't know where to start? Answer a few questions about your grades, interests, and goals. Our AI will recommend Reach, Target, and Safety university programs across Canada that are a good fit for you."
+    description: "Don't know where to start? This tool is your personal guidance counselor. You'll answer a few simple questions about your grades, academic interests, career goals, and even your extracurricular activities. Our AI will then process this information and generate a personalized list of university program suggestions across Canada. The recommendations are broken down into Reach, Target, and Safety categories, each with a detailed justification explaining why it's a good fit for you, helping you discover programs you may not have even known existed."
   },
   {
     title: 'AI Admission Calculator',
     icon: Calculator,
-    description: "Get a realistic estimate of your admission chances for any Canadian university program. The AI provides a percentage and a detailed analysis of your application's strengths, weaknesses, and areas for improvement."
+    description: "Get a realistic, data-driven estimate of your admission chances for any Canadian university program. Simply input your grades, extracurriculars, awards, and the university and program you're targeting. The AI will provide a percentage chance of admission and, more importantly, a detailed qualitative analysis. This analysis breaks down your application's strengths, weaknesses, and provides concrete, actionable suggestions for improvement, giving you a clear path forward."
   },
   {
     title: 'AI Timeline Generator',
     icon: FileClock,
-    description: 'Generate a personalized, month-by-month application timeline. Enter your grade and goals, and the AI will create a checklist of key tasks and deadlines to keep you on track.'
+    description: 'Feeling overwhelmed by deadlines? This tool generates a personalized, month-by-month application timeline. Just enter your current grade and your application goals (e.g., aiming for early admission, applying for specific scholarships). The AI will create a detailed checklist of key tasks—from drafting essays to requesting reference letters—and map them out from the fall of your school year to the final decision deadlines, ensuring you never miss a critical step.'
   },
   {
     title: 'Program Explorer',
     icon: GraduationCap,
-    description: 'Browse our database of university programs across Canada. Filter by province and faculty to explore your options and discover new possibilities.'
+    description: 'Browse our comprehensive, manually curated database of university programs across Canada. This feature allows you to explore your options without any AI guidance. You can filter programs by province and faculty to see what is available, compare different universities, and discover new and interesting fields of study that you might want to consider for your future.'
   },
   {
     title: 'AI Scholarship Matchmaker',
     icon: DollarSign,
-    description: 'Load your profile from the Story Builder, and our AI will search our database of Canadian scholarships to find funding opportunities tailored to your unique background, achievements, and experiences.'
+    description: 'Financing your education is a huge part of the application process. First, load your unique profile from the Story Builder. Our AI will then search our extensive database of Canadian scholarships and find funding opportunities that are specifically tailored to your unique background, achievements, academic record, and experiences. It provides a list of top matches with detailed justifications, saving you hundreds of hours of manual searching.'
   },
   {
     title: 'Extracurricular Explorer',
     icon: Lightbulb,
-    description: 'Find impactful extracurricular activities to boost your application. You can filter by category and province and add them directly to your Story Builder.'
+    description: 'Find impactful extracurricular activities to boost your application and make you a more well-rounded candidate. Our explorer lets you browse a wide range of opportunities, from national STEM competitions to local volunteer organizations. You can filter by category (like STEM, Business, or Arts) and province to find activities that align with your passions. You can then add them directly to your Story Builder with a single click.'
   },
   {
     title: 'Deadline Calendar',
     icon: Calendar,
-    description: 'Never miss a deadline. This calendar automatically syncs with your application tracker and timeline generator to give you a clear view of all your important dates.'
+    description: 'Never miss an important deadline again. This feature provides a clear, visual calendar that automatically syncs with your Application Tracker and the tasks generated by the AI Timeline Generator. It gives you a centralized view of all your upcoming application deadlines, scholarship due dates, and personal tasks, helping you manage your time effectively and reduce stress.'
   },
   {
     title: 'Story Builder',
     icon: BookOpen,
-    description: 'This is where you craft your unique narrative. Add your extracurriculars, achievements, skills, and personal stories. The AI tools use this information to provide personalized results.'
+    description: 'This is where you craft your unique application narrative. It’s a structured workspace designed to capture all the essential components of your story. You can document your extracurriculars with specific roles and impacts, list your awards, detail your skills, and write your personal story. The information you save here is used by the AI Essay Tool and Scholarship Matchmaker to provide highly personalized, effective results.'
   },
   {
     title: 'AI Essay Tool',
     icon: Sparkles,
-    description: "Get feedback on your application essays. Paste your draft and the AI will provide strengths, weaknesses, and suggestions. You can also use your Story Builder narrative to generate improved, personalized essay content."
+    description: "Receive powerful feedback on your application essays. Paste your draft into the tool, and the AI will provide a detailed analysis of its strengths, weaknesses, and actionable suggestions for improvement. Even better, you can use your saved Story Builder narrative to have the AI generate improved, personalized essay content that weaves in your unique experiences and achievements, making your story shine."
   },
    {
     title: 'Extracurricular Impact Suggester',
     icon: BrainCircuit,
-    description: "Struggling to describe your activities? In the Story Builder, click 'Suggest Impact' for any extracurricular. The AI will help you phrase your accomplishments using action-oriented language that impresses admissions officers."
+    description: "Struggling to describe your activities in a compelling way? This tool is built right into the Story Builder. For any extracurricular you've added, simply click the 'Suggest Impact' button. The AI will analyze what you did and help you phrase your accomplishments using the powerful, action-oriented, and quantifiable language that truly impresses admissions officers."
   },
 ];
 
 export default function GuidePage() {
+  const [userNeed, setUserNeed] = useState('');
+  const [recommendations, setRecommendations] = useState<RecommendFeaturesOutput | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleRecommend = async () => {
+    if (!userNeed) {
+      toast({
+        title: 'Please describe your need',
+        description: 'Tell us what you need help with to get a recommendation.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setIsLoading(true);
+    setRecommendations(null);
+    try {
+      const result = await recommendFeatures({ userNeed });
+      setRecommendations(result);
+    } catch (error) {
+      console.error('Failed to get recommendations:', error);
+      toast({
+        title: 'Recommendation Failed',
+        description: 'Could not get a recommendation at this time. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
   return (
     <div className="space-y-6">
       <header>
@@ -81,13 +119,59 @@ export default function GuidePage() {
         </p>
       </header>
       
+       <Card>
+        <CardHeader>
+          <CardTitle>What do you need help with?</CardTitle>
+          <CardDescription>
+            Describe a challenge or question you have about university applications, and our AI will recommend the best features to help you.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label htmlFor="user-need">My Challenge</Label>
+            <Textarea
+              id="user-need"
+              placeholder="e.g., 'I don't know if my grades are good enough for UofT Engineering' or 'How do I make my volunteer work sound impressive?'"
+              value={userNeed}
+              onChange={(e) => setUserNeed(e.target.value)}
+              className="mt-2"
+            />
+          </div>
+          <Button onClick={handleRecommend} disabled={isLoading}>
+            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+            Recommend Features
+          </Button>
+
+          {recommendations && (
+            <div className="pt-4 space-y-4">
+               <h3 className="text-lg font-semibold">Here are some features that can help:</h3>
+               <p className="text-muted-foreground">{recommendations.overallJustification}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {recommendations.recommendedFeatures.map((feature, index) => (
+                  <Card key={index} className="bg-muted/50">
+                    <CardHeader>
+                      <CardTitle className="text-xl">{feature.featureName}</CardTitle>
+                      <CardDescription>{feature.justification}</CardDescription>
+                    </CardHeader>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+
       <Card>
+        <CardHeader>
+            <CardTitle>All Features</CardTitle>
+        </CardHeader>
         <CardContent className="p-6">
           <Accordion type="single" collapsible className="w-full space-y-2">
             {features.map((feature, index) => (
-              <AccordionItem key={index} value={`item-${index}`} className="border-b-0">
+              <AccordionItem key={index} value={`item-${index}`} className="border-none">
                   <Card className="bg-card/50">
-                    <AccordionTrigger className="p-4 hover:no-underline">
+                    <AccordionTrigger className="p-4 hover:no-underline text-left">
                         <div className="flex items-center gap-3">
                             <feature.icon className="w-6 h-6 text-primary" />
                             <span className="font-semibold text-lg">{feature.title}</span>
