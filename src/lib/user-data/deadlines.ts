@@ -1,3 +1,4 @@
+
 import { db } from '@/lib/firebase';
 import {
   collection,
@@ -6,6 +7,8 @@ import {
   addDoc,
   deleteDoc,
   doc,
+  where,
+  writeBatch,
 } from 'firebase/firestore';
 
 export interface Deadline {
@@ -35,8 +38,21 @@ export const addDeadline = async (userId: string, deadline: DeadlineData): Promi
   return docRef.id;
 };
 
-// Function to delete a deadline
-export const deleteDeadline = async (userId: string, deadlineId: string) => {
-  const deadlineRef = doc(db, `users/${userId}/deadlines`, deadlineId);
-  await deleteDoc(deadlineRef);
+// Function to delete a deadline by its own ID or by its sourceId
+export const deleteDeadline = async (userId: string, id: string, bySourceId: boolean = false) => {
+  const deadlinesRef = collection(db, `users/${userId}/deadlines`);
+  if (bySourceId) {
+    // If deleting by sourceId (e.g., when an application is deleted)
+    const q = query(deadlinesRef, where("sourceId", "==", id));
+    const querySnapshot = await getDocs(q);
+    const batch = writeBatch(db);
+    querySnapshot.forEach((doc) => {
+        batch.delete(doc.ref);
+    });
+    await batch.commit();
+  } else {
+    // If deleting by the deadline's own document ID
+    const deadlineRef = doc(db, `users/${userId}/deadlines`, id);
+    await deleteDoc(deadlineRef);
+  }
 };
