@@ -1,3 +1,4 @@
+
 import { db } from '@/lib/firebase';
 import {
   collection,
@@ -38,32 +39,18 @@ export type ApplicationTaskData = Omit<ApplicationTask, 'id'>;
 export const getApplications = async (userId: string): Promise<Application[]> => {
   const appsQuery = query(collection(db, `users/${userId}/applications`));
   const appsSnapshot = await getDocs(appsQuery);
-  const applications: Application[] = appsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Application));
 
-  if (applications.length === 0) {
-    return [];
-  }
-
-  // Fetch all tasks for the user in a single query
-  const tasksQuery = query(collectionGroup(db, 'tasks'), where('__name__', '>', `users/${userId}/applications/`), where('__name__', '<', `users/${userId}/applications/\uf8ff`));
-  const tasksSnapshot = await getDocs(tasksQuery);
-
-  // Create a map of applicationId to its tasks
-  const tasksMap = new Map<string, ApplicationTask[]>();
-  tasksSnapshot.forEach(doc => {
-    const pathParts = doc.ref.path.split('/');
-    const appId = pathParts[pathParts.length - 2];
-    const task = { id: doc.id, ...doc.data() } as ApplicationTask;
-    if (!tasksMap.has(appId)) {
-      tasksMap.set(appId, []);
-    }
-    tasksMap.get(appId)!.push(task);
-  });
-  
-  // Attach tasks to their respective applications
-  applications.forEach(app => {
-    app.tasks = tasksMap.get(app.id) || [];
-  });
+  const applications = await Promise.all(
+    appsSnapshot.docs.map(async (appDoc) => {
+      const application: Application = { id: appDoc.id, ...appDoc.data() } as Application;
+      
+      const tasksQuery = query(collection(db, `users/${userId}/applications/${appDoc.id}/tasks`));
+      const tasksSnapshot = await getDocs(tasksQuery);
+      application.tasks = tasksSnapshot.docs.map(taskDoc => ({ id: taskDoc.id, ...taskDoc.data() } as ApplicationTask));
+      
+      return application;
+    })
+  );
   
   return applications.sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
 };
