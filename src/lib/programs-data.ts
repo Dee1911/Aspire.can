@@ -1,4 +1,12 @@
+/**
+ * @fileOverview This file contains static data for Canadian university programs.
+ * This data is used by the Program Explorer feature to allow users to browse
+ * and discover different academic opportunities.
+ */
 
+/**
+ * Defines the structure for a single university program object.
+ */
 export interface UniversityProgram {
   universityName: string;
   programName: string;
@@ -12,10 +20,12 @@ export interface UniversityProgram {
   preferredExtracurriculars: string;
   coopOption: boolean;
   website: string;
-  image: string;
-  hint: string;
 }
 
+/**
+ * A comprehensive list of university programs across Canada.
+ * This array serves as the primary database for the Program Explorer feature.
+ */
 export const programs: UniversityProgram[] = [
   {
     universityName: 'University of Toronto',
@@ -30,8 +40,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming competitions; robotics clubs; math contests; tech projects',
     coopOption: true,
     website: 'https://www.artsci.utoronto.ca/future/academics/programs-degrees/computer-science',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'university campus'
   },
   {
     universityName: 'University of Toronto',
@@ -46,8 +54,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Research experience; science olympiad; lab volunteering; environmental clubs',
     coopOption: true,
     website: 'https://www.artsci.utoronto.ca/future/academics/programs-degrees/life-sciences',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'science lab'
   },
   {
     universityName: 'University of Toronto',
@@ -62,8 +68,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership roles; business competitions; entrepreneurship; community service',
     coopOption: true,
     website: 'https://rotmancommerce.utoronto.ca/admissions',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'business school'
   },
   {
     universityName: 'University of Toronto',
@@ -78,8 +82,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Science fairs; research projects; engineering competitions; STEM leadership',
     coopOption: true,
     website: 'https://engsci.utoronto.ca/admissions/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'engineering building'
   },
   {
     universityName: 'University of British Columbia',
@@ -94,8 +96,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming projects; hackathons; tech volunteering; computer clubs',
     coopOption: true,
     website: 'https://www.cs.ubc.ca/students/undergrad/admission',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'university campus'
   },
   {
     universityName: 'University of British Columbia',
@@ -110,8 +110,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership; business experience; community involvement; entrepreneurship',
     coopOption: true,
     website: 'https://www.sauder.ubc.ca/programs/bachelor-commerce/admissions',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'modern building'
   },
   {
     universityName: 'University of British Columbia',
@@ -126,8 +124,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; robotics; science projects; technical leadership',
     coopOption: true,
     website: 'https://www.apsc.ubc.ca/admissions',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'engineering workshop'
   },
   {
     universityName: 'University of British Columbia',
@@ -142,8 +138,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Sports participation; coaching; health-related volunteering; fitness leadership',
     coopOption: true,
     website: 'https://kin.educ.ubc.ca/undergraduate-programs/admissions/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'sports facility'
   },
   {
     universityName: 'McGill University',
@@ -158,8 +152,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming competitions; tech projects; math contests; computer science clubs',
     coopOption: true,
     website: 'https://www.mcgill.ca/study/2023-2024/faculties/science/undergraduate/programs/bachelor-science-bsc-major-computer-science',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'historic architecture'
   },
   {
     universityName: 'McGill University',
@@ -174,8 +166,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership roles; business competitions; community service; international experience',
     coopOption: false,
     website: 'https://www.mcgill.ca/desautels/programs/bcom',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'business lecture'
   },
   {
     universityName: 'McGill University',
@@ -190,8 +180,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Research experience; science competitions; lab volunteering; environmental activities',
     coopOption: true,
     website: 'https://www.mcgill.ca/study/2023-2024/faculties/science/undergraduate/programs/bachelor-science-bsc-major-biology',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'biology research'
   },
   {
     universityName: 'McGill University',
@@ -206,8 +194,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; robotics clubs; science fairs; technical projects',
     coopOption: true,
     website: 'https://www.mcgill.ca/engineering/students/undergraduate/admissions',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'engineering students'
   },
   {
     universityName: 'University of Waterloo',
@@ -222,8 +208,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming contests; hackathons; open source contributions; math competitions',
     coopOption: true,
     website: 'https://uwaterloo.ca/future-students/programs/computer-science',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'coding on screen'
   },
   {
     universityName: 'University of Waterloo',
@@ -238,8 +222,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming projects; engineering competitions; robotics; leadership in STEM',
     coopOption: true,
     website: 'https://uwaterloo.ca/future-students/programs/software-engineering',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'software development'
   },
   {
     universityName: 'University of Waterloo',
@@ -254,8 +236,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Business competitions; accounting clubs; finance internships; leadership roles',
     coopOption: true,
     website: 'https://uwaterloo.ca/future-students/programs/accounting-and-financial-management',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'financial charts'
   },
   {
     universityName: 'University of Waterloo',
@@ -270,8 +250,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering design teams; robotics; science fairs; technical leadership',
     coopOption: true,
     website: 'https://uwaterloo.ca/future-students/programs/engineering',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'engineering students collaborating'
   },
   {
     universityName: 'McMaster University',
@@ -286,8 +264,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Healthcare volunteering; research experience; leadership in health; community service',
     coopOption: false,
     website: 'https://healthsci.mcmaster.ca/admissions',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'health science lab'
   },
   {
     universityName: 'McMaster University',
@@ -302,8 +278,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; robotics teams; design projects; STEM leadership',
     coopOption: true,
     website: 'https://www.eng.mcmaster.ca/future-students/undergraduate-admissions',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'engineering design'
   },
   {
     universityName: 'McMaster University',
@@ -318,8 +292,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Research experience; interdisciplinary projects; science competitions; innovation',
     coopOption: false,
     website: 'https://www.science.mcmaster.ca/isci/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'interdisciplinary science'
   },
   {
     universityName: 'McMaster University',
@@ -334,8 +306,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership roles; business clubs; entrepreneurship; community involvement',
     coopOption: true,
     website: 'https://www.degroote.mcmaster.ca/programs/undergraduate-programs/bachelor-of-commerce/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'business students'
   },
   {
     universityName: "Queen's University",
@@ -350,8 +320,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership experience; business competitions; community service; international experience',
     coopOption: true,
     website: 'https://smith.queensu.ca/bcom/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'historic university'
   },
   {
     universityName: "Queen's University",
@@ -366,8 +334,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; robotics; design projects; technical leadership',
     coopOption: true,
     website: 'https://www.queensu.ca/admission/programs/engineering',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'engineering students'
   },
   {
     universityName: "Queen's University",
@@ -382,8 +348,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming contests; hackathons; math competitions; tech volunteering',
     coopOption: false,
     website: 'https://www.cs.queensu.ca/undergraduate/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'computer lab'
   },
   {
     universityName: "Queen's University",
@@ -398,8 +362,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Research experience; science olympiad; lab volunteering; environmental clubs',
     coopOption: false,
     website: 'https://www.queensu.ca/admission/programs/life-sciences',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'science students'
   },
   {
     universityName: 'Western University',
@@ -414,8 +376,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Exceptional leadership; business experience; community impact; international experience',
     coopOption: true,
     website: 'https://www.ivey.uwo.ca/hba/admissions/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'business meeting'
   },
   {
     universityName: 'Western University',
@@ -430,8 +390,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; design teams; robotics; technical projects',
     coopOption: true,
     website: 'https://www.eng.uwo.ca/undergraduate/future-students/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'engineering design'
   },
   {
     universityName: 'Western University',
@@ -446,8 +404,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming competitions; hackathons; computer clubs; tech projects',
     coopOption: true,
     website: 'https://www.csd.uwo.ca/undergraduate/index.html',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'computer programming'
   },
   {
     universityName: 'Western University',
@@ -462,8 +418,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Research experience; healthcare volunteering; science competitions; lab experience',
     coopOption: false,
     website: 'https://www.uwo.ca/sci/undergraduate/programs/medical_science.html',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'medical research'
   },
   {
     universityName: 'University of Alberta',
@@ -478,8 +432,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; robotics; science projects; technical leadership',
     coopOption: true,
     website: 'https://www.ualberta.ca/engineering/student-services/prospective-students/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'university campus'
   },
   {
     universityName: 'University of Alberta',
@@ -494,8 +446,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming competitions; hackathons; computer clubs; math contests',
     coopOption: true,
     website: 'https://www.ualberta.ca/computing-science/undergraduate-studies/prospective-students/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'coding on laptop'
   },
   {
     universityName: 'University of Alberta',
@@ -510,8 +460,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership roles; business competitions; entrepreneurship; community service',
     coopOption: true,
     website: 'https://www.ualberta.ca/business/programs/bachelor-of-commerce/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'business students'
   },
   {
     universityName: 'University of Alberta',
@@ -526,8 +474,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Healthcare volunteering; leadership; community service; healthcare experience',
     coopOption: false,
     website: 'https://www.ualberta.ca/nursing/programs/bachelor-of-science-in-nursing/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'nursing students'
   },
   {
     universityName: 'York University',
@@ -542,8 +488,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming projects; hackathons; computer clubs; tech volunteering',
     coopOption: true,
     website: 'https://lassonde.yorku.ca/computer-science',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'university building'
   },
   {
     universityName: 'York University',
@@ -558,8 +502,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership experience; business competitions; community service; international experience',
     coopOption: true,
     website: 'https://schulich.yorku.ca/programs/undergraduate/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'business school building'
   },
   {
     universityName: 'York University',
@@ -574,8 +516,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; robotics; design projects; STEM activities',
     coopOption: true,
     website: 'https://lassonde.yorku.ca/admissions/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'engineering lab'
   },
   {
     universityName: 'York University',
@@ -590,8 +530,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Sports participation; coaching; health-related volunteering; fitness leadership',
     coopOption: false,
     website: 'https://health.yorku.ca/kinesiology-health-science/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'fitness center'
   },
   {
     universityName: 'Toronto Metropolitan University',
@@ -606,8 +544,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; design projects; robotics; technical activities',
     coopOption: true,
     website: 'https://www.torontomet.ca/engineering/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'city campus'
   },
   {
     universityName: 'Toronto Metropolitan University',
@@ -622,8 +558,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership roles; business activities; entrepreneurship; community service',
     coopOption: true,
     website: 'https://www.torontomet.ca/trsm-undergraduate/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'modern architecture'
   },
   {
     universityName: 'Toronto Metropolitan University',
@@ -638,8 +572,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming projects; hackathons; computer clubs; tech competitions',
     coopOption: true,
     website: 'https://www.torontomet.ca/programs/undergraduate/computer-science/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'downtown campus'
   },
   {
     universityName: 'Toronto Metropolitan University',
@@ -654,8 +586,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Healthcare volunteering; leadership; community service; healthcare experience',
     coopOption: false,
     website: 'https://www.torontomet.ca/programs/undergraduate/nursing/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'nursing students'
   },
   {
     universityName: 'Carleton University',
@@ -670,8 +600,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming competitions; hackathons; computer clubs; math contests',
     coopOption: true,
     website: 'https://carleton.ca/scs/undergraduate-programs/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'university library'
   },
   {
     universityName: 'Carleton University',
@@ -686,8 +614,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; design teams; robotics; technical projects',
     coopOption: true,
     website: 'https://carleton.ca/engineering-design/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'engineering building'
   },
   {
     universityName: 'Carleton University',
@@ -702,8 +628,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership roles; business competitions; entrepreneurship; community involvement',
     coopOption: true,
     website: 'https://sprott.carleton.ca/undergraduate-programs/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'business campus'
   },
   {
     universityName: 'Carleton University',
@@ -718,8 +642,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Writing portfolio; media experience; communications activities; current events knowledge',
     coopOption: false,
     website: 'https://carleton.ca/journalism/undergraduate/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'journalism student'
   },
   {
     universityName: 'University of Ottawa',
@@ -734,8 +656,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; design projects; robotics; bilingual skills valued',
     coopOption: true,
     website: 'https://engineering.uottawa.ca/undergraduate-programs',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'university campus'
   },
   {
     universityName: 'University of Ottawa',
@@ -750,8 +670,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming competitions; hackathons; computer clubs; bilingual skills valued',
     coopOption: true,
     website: 'https://www.uottawa.ca/faculty-engineering/undergraduate-programs/computer-science',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'coding students'
   },
   {
     universityName: 'University of Ottawa',
@@ -766,8 +684,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership roles; business competitions; bilingual skills; international experience',
     coopOption: true,
     website: 'https://telfer.uottawa.ca/en/programs/undergraduate/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'business students'
   },
   {
     universityName: 'University of Ottawa',
@@ -782,8 +698,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Healthcare volunteering; research experience; community service; bilingual skills valued',
     coopOption: false,
     website: 'https://health.uottawa.ca/undergraduate-programs/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'health science lab'
   },
   {
     universityName: 'Simon Fraser University',
@@ -798,8 +712,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming competitions; hackathons; tech projects; computer clubs',
     coopOption: true,
     website: 'https://www.sfu.ca/computing/prospective-students/undergraduate-students.html',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'mountain campus'
   },
   {
     universityName: 'Simon Fraser University',
@@ -814,8 +726,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; robotics; science projects; technical leadership',
     coopOption: true,
     website: 'https://www.sfu.ca/engineering/prospective-students/undergraduate-programs.html',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'engineering students'
   },
   {
     universityName: 'Simon Fraser University',
@@ -830,8 +740,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership experience; business competitions; entrepreneurship; community service',
     coopOption: true,
     website: 'https://beedie.sfu.ca/programs/undergraduate/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'modern architecture'
   },
   {
     universityName: 'Simon Fraser University',
@@ -846,8 +754,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Sports participation; coaching; health-related activities; fitness leadership',
     coopOption: false,
     website: 'https://www.sfu.ca/biomedical-physiology-kinesiology/prospective-students/undergraduate.html',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'gymnastics'
   },
   {
     universityName: 'Dalhousie University',
@@ -862,8 +768,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; design projects; robotics; maritime industry experience',
     coopOption: true,
     website: 'https://www.dal.ca/faculty/engineering/programs/undergraduate.html',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'coastal university'
   },
   {
     universityName: 'Dalhousie University',
@@ -878,8 +782,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming competitions; hackathons; computer clubs; tech volunteering',
     coopOption: true,
     website: 'https://www.cs.dal.ca/undergraduate/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'computer lab'
   },
   {
     universityName: 'Dalhousie University',
@@ -894,8 +796,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership roles; business activities; community service; maritime business experience',
     coopOption: true,
     website: 'https://www.dal.ca/faculty/management/programs/undergraduate.html',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'business students'
   },
   {
     universityName: 'Dalhousie University',
@@ -910,8 +810,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Healthcare volunteering; research experience; community service; health-related leadership',
     coopOption: false,
     website: 'https://www.dal.ca/faculty/health/programs/undergraduate.html',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'health research'
   },
   {
     universityName: 'University of Calgary',
@@ -926,8 +824,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; robotics; energy sector projects; technical leadership',
     coopOption: true,
     website: 'https://schulich.ucalgary.ca/future-students/undergraduate/admissions',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'city skyline'
   },
   {
     universityName: 'University of Calgary',
@@ -942,8 +838,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming competitions; hackathons; computer clubs; tech industry experience',
     coopOption: true,
     website: 'https://www.ucalgary.ca/future-students/undergraduate/explore-programs/computer-science',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'modern campus'
   },
   {
     universityName: 'University of Calgary',
@@ -958,8 +852,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership roles; business competitions; entrepreneurship; energy industry experience',
     coopOption: true,
     website: 'https://haskayne.ucalgary.ca/programs/undergraduate/bachelor-commerce',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'business building'
   },
   {
     universityName: 'University of Calgary',
@@ -974,8 +866,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Sports participation; coaching; health/fitness activities; research experience',
     coopOption: false,
     website: 'https://kinesiology.ucalgary.ca/undergraduate/future-students',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'sports science'
   },
   {
     universityName: 'University of Manitoba',
@@ -990,8 +880,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; design projects; robotics; technical activities',
     coopOption: true,
     website: 'https://umanitoba.ca/engineering/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'university campus'
   },
   {
     universityName: 'University of Manitoba',
@@ -1006,8 +894,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming competitions; computer clubs; hackathons; tech projects',
     coopOption: true,
     website: 'https://sci.umanitoba.ca/cs/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'computer lab'
   },
   {
     universityName: 'University of Manitoba',
@@ -1022,8 +908,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership roles; business competitions; community involvement; entrepreneurship',
     coopOption: true,
     website: 'https://umanitoba.ca/asper/undergraduate-programs/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'business students'
   },
   {
     universityName: 'University of Manitoba',
@@ -1038,8 +922,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Healthcare volunteering; research experience; leadership; community service',
     coopOption: false,
     website: 'https://umanitoba.ca/health-sciences/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'health science building'
   },
   {
     universityName: 'University of Saskatchewan',
@@ -1054,8 +936,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; design projects; agriculture/mining industry experience',
     coopOption: true,
     website: 'https://engineering.usask.ca/admissions/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'university campus'
   },
   {
     universityName: 'University of Saskatchewan',
@@ -1070,8 +950,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming competitions; computer clubs; tech projects; agriculture technology',
     coopOption: true,
     website: 'https://artsandscience.usask.ca/computerscience/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'computer lab'
   },
   {
     universityName: 'University of Saskatchewan',
@@ -1086,8 +964,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership roles; business competitions; agriculture business experience; community service',
     coopOption: true,
     website: 'https://edwards.usask.ca/programs/undergraduate/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'business students'
   },
   {
     universityName: 'University of Saskatchewan',
@@ -1102,8 +978,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Agricultural experience; 4-H; FFA; environmental clubs; rural community involvement',
     coopOption: true,
     website: 'https://agbio.usask.ca/programs/undergraduate/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'agriculture field'
   },
   {
     universityName: 'Concordia University',
@@ -1118,8 +992,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming competitions; hackathons; computer clubs; bilingual skills valued',
     coopOption: true,
     website: 'https://www.concordia.ca/academics/undergraduate/computer-science.html',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'city campus'
   },
   {
     universityName: 'Concordia University',
@@ -1134,8 +1006,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; design projects; robotics; technical leadership',
     coopOption: true,
     website: 'https://www.concordia.ca/ginacody/programs/undergraduate.html',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'engineering building'
   },
   {
     universityName: 'Concordia University',
@@ -1150,8 +1020,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership roles; business competitions; bilingual skills; international experience',
     coopOption: true,
     website: 'https://www.concordia.ca/jmsb/programs/undergraduate.html',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'business building'
   },
   {
     universityName: 'Concordia University',
@@ -1166,8 +1034,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Psychology research; mental health awareness; community service; helping professions experience',
     coopOption: false,
     website: 'https://www.concordia.ca/artsci/psychology/programs/undergraduate.html',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'psychology lecture'
   },
   {
     universityName: 'University of Victoria',
@@ -1182,8 +1048,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming competitions; hackathons; tech projects; computer clubs',
     coopOption: true,
     website: 'https://www.uvic.ca/engineering/computerscience/undergraduate/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'coastal campus'
   },
   {
     universityName: 'University of Victoria',
@@ -1198,8 +1062,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; design teams; robotics; environmental projects',
     coopOption: true,
     website: 'https://www.uvic.ca/engineering/undergraduate/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'engineering students'
   },
   {
     universityName: 'University of Victoria',
@@ -1214,8 +1076,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership experience; business competitions; entrepreneurship; sustainability focus',
     coopOption: true,
     website: 'https://www.uvic.ca/gustavson/undergraduate/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'business school building'
   },
   {
     universityName: 'University of Victoria',
@@ -1230,8 +1090,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Psychology research; mental health advocacy; community service; helping professions',
     coopOption: false,
     website: 'https://www.uvic.ca/socialsciences/psychology/undergraduate/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'psychology class'
   },
   {
     universityName: 'Wilfrid Laurier University',
@@ -1246,8 +1104,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership roles; business competitions; community service; entrepreneurship',
     coopOption: true,
     website: 'https://www.wlu.ca/programs/business-and-economics/undergraduate/business-administration-bba/index.html',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'university campus'
   },
   {
     universityName: 'Wilfrid Laurier University',
@@ -1262,8 +1118,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming competitions; hackathons; computer clubs; tech volunteering',
     coopOption: true,
     website: 'https://www.wlu.ca/programs/science/undergraduate/computer-science-bsc/index.html',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'computer lab'
   },
   {
     universityName: 'Wilfrid Laurier University',
@@ -1278,8 +1132,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Sports participation; coaching; health-related volunteering; fitness leadership',
     coopOption: false,
     website: 'https://www.wlu.ca/programs/science/undergraduate/kinesiology-bsc/index.html',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'fitness center'
   },
   {
     universityName: 'Wilfrid Laurier University',
@@ -1294,8 +1146,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Psychology research; mental health awareness; community service; helping professions experience',
     coopOption: false,
     website: 'https://www.wlu.ca/programs/science/undergraduate/psychology-ba-bsc/index.html',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'psychology lecture'
   },
   {
     universityName: 'Brock University',
@@ -1310,8 +1160,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership roles; business activities; community service; co-op focus',
     coopOption: true,
     website: 'https://brocku.ca/programs/undergraduate/business-administration/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'university campus'
   },
   {
     universityName: 'Brock University',
@@ -1326,8 +1174,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming projects; computer clubs; hackathons; tech volunteering',
     coopOption: true,
     website: 'https://brocku.ca/programs/undergraduate/computer-science/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'computer lab'
   },
   {
     universityName: 'Brock University',
@@ -1342,8 +1188,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Sports participation; coaching; health/fitness activities; research experience',
     coopOption: false,
     website: 'https://brocku.ca/programs/undergraduate/kinesiology/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'fitness center'
   },
   {
     universityName: 'Brock University',
@@ -1358,8 +1202,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Healthcare volunteering; leadership; community service; healthcare experience',
     coopOption: false,
     website: 'https://brocku.ca/programs/undergraduate/nursing/',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'nursing students'
   },
   {
     universityName: 'University of Windsor',
@@ -1374,8 +1216,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Engineering competitions; design projects; automotive industry experience; technical leadership',
     coopOption: true,
     website: 'https://www.uwindsor.ca/engineering/future-students',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'university campus'
   },
   {
     universityName: 'University of Windsor',
@@ -1390,8 +1230,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Programming competitions; computer clubs; tech projects; automotive technology',
     coopOption: true,
     website: 'https://www.uwindsor.ca/science/computerscience/future-students',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'computer lab'
   },
   {
     universityName: 'University of Windsor',
@@ -1406,8 +1244,6 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Leadership roles; business competitions; automotive business experience; cross-border commerce',
     coopOption: true,
     website: 'https://www.uwindsor.ca/business/programs/undergraduate',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'business building'
   },
   {
     universityName: 'University of Windsor',
@@ -1422,7 +1258,5 @@ export const programs: UniversityProgram[] = [
     preferredExtracurriculars: 'Healthcare volunteering; leadership; community service; healthcare experience',
     coopOption: false,
     website: 'https://www.uwindsor.ca/nursing/future-students',
-    image: 'https://placehold.co/600x400.png',
-    hint: 'nursing students'
   },
 ];

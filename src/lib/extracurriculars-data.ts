@@ -1,4 +1,12 @@
+/**
+ * @fileOverview This file contains static data for extracurricular activities.
+ * This data is used by the Extracurricular Explorer feature to help users
+ * discover new opportunities to enhance their profiles.
+ */
 
+/**
+ * Defines the structure for a single extracurricular activity object.
+ */
 export interface ExtracurricularActivity {
   name: string;
   type: string;
@@ -14,10 +22,12 @@ export interface ExtracurricularActivity {
   competitive: boolean;
   annual: boolean;
   format: string;
-  image: string;
-  hint: string;
 }
 
+/**
+ * A comprehensive list of extracurricular activities available in Canada.
+ * This array serves as the primary database for the Extracurricular Explorer feature.
+ */
 export const activities: ExtracurricularActivity[] = [
   {
     "name": "SHAD Canada",
@@ -34,8 +44,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person/Virtual",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "innovation lab"
   },
   {
     "name": "Canadian Mathematical Olympiad (CMO)",
@@ -52,8 +60,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "math equation"
   },
   {
     "name": "Canadian Open Mathematics Challenge (COMC)",
@@ -70,8 +76,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "mathematics exam"
   },
   {
     "name": "Euclid Mathematics Contest",
@@ -88,8 +92,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "geometry problem"
   },
   {
     "name": "Pascal, Cayley, Fermat Contests",
@@ -106,8 +108,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person/Online",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "math competition"
   },
   {
     "name": "Canadian Physics Olympiad (CAP)",
@@ -124,8 +124,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "physics experiment"
   },
   {
     "name": "Canadian Chemistry Competition (CCC)",
@@ -142,8 +140,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "chemistry lab"
   },
   {
     "name": "Canadian Biology Olympiad (CBO)",
@@ -160,8 +156,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "biology microscope"
   },
   {
     "name": "Canadian Computing Competition (CCC)",
@@ -178,8 +172,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "Online",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "coding competition"
   },
   {
     "name": "Canada-Wide Science Fair (CWSF)",
@@ -196,8 +188,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "science fair"
   },
   {
     "name": "Sanofi Biogenius Canada Competition",
@@ -214,8 +204,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "biotechnology research"
   },
   {
     "name": "Canadian High Schools Model United Nations (CAHSMUN)",
@@ -232,8 +220,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "model un"
   },
   {
     "name": "DECA Canada Provincial Competition",
@@ -250,8 +236,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "business competition"
   },
   {
     "name": "FIRST Robotics Competition Canada",
@@ -268,8 +252,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "robotics competition"
   },
   {
     "name": "Duke of Edinburgh Award Canada",
@@ -286,8 +268,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "outdoor adventure"
   },
   {
     "name": "Youth Parliament of Canada",
@@ -304,8 +284,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "parliament building"
   },
   {
     "name": "House of Commons Page Program",
@@ -322,8 +300,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "government building"
   },
   {
     "name": "Canada Service Corps",
@@ -340,8 +316,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person/Virtual",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "community volunteering"
   },
   {
     "name": "Terry Fox Run School Participation",
@@ -358,8 +332,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "charity run"
   },
   {
     "name": "MasseyHacks",
@@ -376,8 +348,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "hackathon event"
   },
   {
     "name": "JAMHacks",
@@ -394,8 +364,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "coding on laptop"
   },
   {
     "name": "Hack The Ridge",
@@ -412,8 +380,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "students collaborating"
   },
   {
     "name": "EurekaHACKS",
@@ -430,8 +396,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "team brainstorming"
   },
   {
     "name": "CalgaryHacks",
@@ -448,8 +412,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "city skyline"
   },
   {
     "name": "Futurpreneur Core Startup Program",
@@ -466,8 +428,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person/Virtual",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "startup meeting"
   },
   {
     "name": "Youth For Entrepreneurship (Y4E)",
@@ -484,8 +444,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "young entrepreneurs"
   },
   {
     "name": "YELL Canada",
@@ -502,8 +460,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "business presentation"
   },
   {
     "name": "Edwards Entrepreneurship Summer Youth Camp",
@@ -520,8 +476,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "summer camp"
   },
   {
     "name": "Brain Bee Canada",
@@ -538,8 +492,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "brain illustration"
   },
   {
     "name": "National Biology Competition (NBC)",
@@ -556,8 +508,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "dna strand"
   },
   {
     "name": "Canadian Student Journalism Awards",
@@ -574,8 +524,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "Virtual",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "writing on notepad"
   },
   {
     "name": "Environment and Climate Change Youth Council",
@@ -592,8 +540,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person/Virtual",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "environmental protest"
   },
   {
     "name": "Youth Climate Action Initiative",
@@ -610,8 +556,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "reforestation project"
   },
   {
     "name": "Canadian Youth Leadership Institute",
@@ -628,8 +572,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "leadership workshop"
   },
   {
     "name": "Rotary Youth Leadership Symposium (RYLS)",
@@ -646,8 +588,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "team building"
   },
   {
     "name": "Canada World Youth",
@@ -664,8 +604,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "global travel"
   },
   {
     "name": "Amnesty International Canada Youth Programs",
@@ -682,8 +620,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person/Virtual",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "human rights"
   },
   {
     "name": "Global Leadership Academy Canada",
@@ -700,8 +636,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "global leaders"
   },
   {
     "name": "Science Bee Canada",
@@ -718,8 +652,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "science quiz"
   },
   {
     "name": "Canadian International Music Competition",
@@ -736,8 +668,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "Virtual",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "piano performance"
   },
   {
     "name": "Wildlife Habitat Canada Art Competition",
@@ -754,8 +684,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "wildlife painting"
   },
   {
     "name": "Young Canadians Parliament",
@@ -772,8 +700,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "Virtual",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "youth parliament"
   },
   {
     "name": "SENgage Youth Program",
@@ -790,8 +716,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person/Virtual",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "senate chamber"
   },
   {
     "name": "Fryer, Galois, Hypatia Mathematics Contests",
@@ -808,8 +732,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "math problems"
   },
   {
     "name": "Gauss Mathematics Contest",
@@ -826,8 +748,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "math test"
   },
   {
     "name": "Canadian Intermediate Mathematics Contest (CIMC)",
@@ -844,8 +764,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "mathematics challenge"
   },
   {
     "name": "Canadian Senior Mathematics Contest (CSMC)",
@@ -862,8 +780,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "senior math"
   },
   {
     "name": "Canadian Team Mathematics Contest (CTMC)",
@@ -880,8 +796,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "team collaboration"
   },
   {
     "name": "Beaver Computing Challenge",
@@ -898,8 +812,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "Online",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "computer screen"
   },
   {
     "name": "Canadian Computing Olympiad (CCO)",
@@ -916,8 +828,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "programming competition"
   },
   {
     "name": "Avogadro Chemistry Exam",
@@ -934,8 +844,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "chemistry exam"
   },
   {
     "name": "Chem 13 News Exam",
@@ -952,8 +860,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "chemistry test"
   },
   {
     "name": "Canadian Chemistry Olympiad (CCO)",
@@ -970,8 +876,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "chemistry olympiad"
   },
   {
     "name": "Amazon Future Engineer Your Voice is Power",
@@ -988,8 +892,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person/Virtual",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "voice technology"
   },
   {
     "name": "FIRST LEGO League",
@@ -1006,8 +908,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "lego robotics"
   },
   {
     "name": "FIRST Tech Challenge",
@@ -1024,8 +924,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "robotics challenge"
   },
   {
     "name": "Skills Canada National Competition",
@@ -1042,8 +940,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "trade skills"
   },
   {
     "name": "Envirothon Canada",
@@ -1060,8 +956,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "environmental science"
   },
   {
     "name": "Canadian Geographic Challenge",
@@ -1078,8 +972,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "world map"
   },
   {
     "name": "Historica Canada Fair",
@@ -1096,8 +988,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "history fair"
   },
   {
     "name": "Poetry In Voice National Recitation Contest",
@@ -1114,8 +1004,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "poetry reading"
   },
   {
     "name": "National Arts Centre Orchestra Young Artists Program",
@@ -1132,8 +1020,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "orchestra performance"
   },
   {
     "name": "Canada Reads Student Challenge",
@@ -1150,8 +1036,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "Virtual",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "reading a book"
   },
   {
     "name": "DECA International Career Development Conference",
@@ -1168,8 +1052,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "business conference"
   },
   {
     "name": "Junior Achievement Company Program",
@@ -1186,8 +1068,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "student business"
   },
   {
     "name": "National Economics Competition",
@@ -1204,8 +1084,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "economics graph"
   },
   {
     "name": "Startup Canada Learn Program",
@@ -1222,8 +1100,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "Virtual",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "online learning"
   },
   {
     "name": "Young Entrepreneurs Organization (YEO) Global Student Entrepreneur Awards",
@@ -1240,8 +1116,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person/Virtual",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "entrepreneur award"
   },
   {
     "name": "National Youth Business Network",
@@ -1258,8 +1132,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person/Virtual",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "business networking"
   },
   {
     "name": "Reach for the Top National Competition",
@@ -1276,8 +1148,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "quiz show"
   },
   {
     "name": "Expo-sciences Hydro-Québec",
@@ -1294,8 +1164,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "science project"
   },
   {
     "name": "Calgary Youth Science Fair",
@@ -1312,8 +1180,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "youth science"
   },
   {
     "name": "Skills Manitoba Competition",
@@ -1330,8 +1196,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "technical skills"
   },
   {
     "name": "Skills Canada Saskatchewan",
@@ -1348,8 +1212,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "welding competition"
   },
   {
     "name": "APEGA Science Olympics",
@@ -1366,8 +1228,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "science olympics"
   },
   {
     "name": "Junior Achievement British Columbia",
@@ -1384,8 +1244,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "financial literacy"
   },
   {
     "name": "Ontario Science Centre Science Rendezvous",
@@ -1402,8 +1260,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "science centre"
   },
   {
     "name": "Nova Scotia Science Fair",
@@ -1420,8 +1276,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "science fair project"
   },
   {
     "name": "New Brunswick Science Fair",
@@ -1438,8 +1292,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "student research"
   },
   {
     "name": "Prince Edward Island Science Fair",
@@ -1456,8 +1308,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "science display"
   },
   {
     "name": "Newfoundland and Labrador Science Fair",
@@ -1474,8 +1324,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "research poster"
   },
   {
     "name": "Yukon Science Fair",
@@ -1492,8 +1340,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "northern lights"
   },
   {
     "name": "Northwest Territories Science Fair",
@@ -1510,8 +1356,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "arctic landscape"
   },
   {
     "name": "Nunavut Science Fair",
@@ -1528,8 +1372,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "inuit art"
   },
   {
     "name": "Ontario Youth Parliament",
@@ -1546,8 +1388,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "ontario legislature"
   },
   {
     "name": "Quebec Youth Parliament",
@@ -1564,8 +1404,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "quebec parliament"
   },
   {
     "name": "Alberta Youth Parliament",
@@ -1582,8 +1420,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "alberta legislature"
   },
   {
     "name": "British Columbia Youth Parliament",
@@ -1600,8 +1436,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "bc legislature"
   },
   {
     "name": "Manitoba Youth Parliament",
@@ -1618,8 +1452,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "manitoba legislature"
   },
   {
     "name": "Saskatchewan Youth Parliament",
@@ -1636,8 +1468,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "saskatchewan legislature"
   },
   {
     "name": "Maritime Youth Parliament",
@@ -1654,8 +1484,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "maritime coast"
   },
   {
     "name": "Indigenous Youth Leadership Program",
@@ -1672,8 +1500,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "indigenous art"
   },
   {
     "name": "Concours de français Odyssée",
@@ -1690,8 +1516,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "french language"
   },
   {
     "name": "Toronto International Film Festival Student Programme",
@@ -1708,8 +1532,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "film festival"
   },
   {
     "name": "Vancouver International Film Festival Youth Programme",
@@ -1726,8 +1548,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "movie theatre"
   },
   {
     "name": "Montreal Science Centre Youth Volunteer Program",
@@ -1744,8 +1564,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "science museum"
   },
   {
     "name": "Calgary Stampede Youth Programs",
@@ -1762,8 +1580,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "calgary stampede"
   },
   {
     "name": "Royal Ontario Museum Youth Programs",
@@ -1780,8 +1596,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": false,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "museum exhibit"
   },
   {
     "name": "Manitoba Youth Climate Change Video Challenge",
@@ -1798,8 +1612,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "Virtual",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "video production"
   },
   {
     "name": "Ontario Student Debate Association",
@@ -1816,8 +1628,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "student debate"
   },
   {
     "name": "Quebec Debate League",
@@ -1834,8 +1644,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "public speaking"
   },
   {
     "name": "Alberta High School Debate Association",
@@ -1852,8 +1660,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "debate competition"
   },
   {
     "name": "British Columbia Student Debate Association",
@@ -1870,8 +1676,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "students debating"
   },
   {
     "name": "Canadian National Debate Championship",
@@ -1888,8 +1692,6 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "debate championship"
   },
   {
     "name": "Remembrance Day Contests - Royal Canadian Legion",
@@ -1906,7 +1708,5 @@ export const activities: ExtracurricularActivity[] = [
     "competitive": true,
     "annual": true,
     "format": "In-person",
-    "image": "https://placehold.co/600x400.png",
-    "hint": "remembrance day"
   }
 ]

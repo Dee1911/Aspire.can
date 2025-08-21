@@ -1,3 +1,11 @@
+/**
+ * @fileOverview This file contains the static data for scholarships available in the app.
+ * This list is used by the AI Scholarship Matchmaker feature.
+ */
+
+/**
+ * Defines the structure for a single scholarship object.
+ */
 export interface Scholarship {
   name: string;
   amount: number;
@@ -6,6 +14,10 @@ export interface Scholarship {
   website: string;
 }
 
+/**
+ * A comprehensive list of scholarships available in Canada.
+ * This array serves as the database for the AI Scholarship Matchmaker.
+ */
 export const scholarships: Scholarship[] = [
   {
     name: 'Schulich Leader Scholarships',
