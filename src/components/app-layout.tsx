@@ -38,6 +38,8 @@ import { Avatar, AvatarFallback } from './ui/avatar';
 const navItems = [
   { href: '/dashboard/guide', icon: HelpCircle, label: 'How-To Guide' },
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/dashboard/story-builder', icon: BookOpen, label: 'Story Builder' },
+  { href: '/dashboard/essay-tool', icon: Sparkles, label: 'AI Essay Tool' },
   { href: '/dashboard/program-finder', icon: Target, label: 'AI Program Finder' },
   {
     href: '/dashboard/admission-calculator',
@@ -45,12 +47,10 @@ const navItems = [
     label: 'Admission Calculator',
   },
   { href: '/dashboard/timeline-generator', icon: FileClock, label: 'Timeline Generator' },
-  { href: '/dashboard/programs', icon: GraduationCap, label: 'Program Explorer' },
   { href: '/dashboard/scholarships', icon: DollarSign, label: 'Scholarships' },
   { href: '/dashboard/extracurriculars', icon: Lightbulb, label: 'Extracurriculars' },
+  { href: '/dashboard/programs', icon: GraduationCap, label: 'Program Explorer' },
   { href: '/dashboard/calendar', icon: Calendar, label: 'Deadlines' },
-  { href: '/dashboard/story-builder', icon: BookOpen, label: 'Story Builder' },
-  { href: '/dashboard/essay-tool', icon: Sparkles, label: 'AI Essay Tool' },
 ];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
