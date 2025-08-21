@@ -85,9 +85,8 @@ export default function LandingPage() {
            <Image
             src="https://placehold.co/1920x1080.png"
             alt="Students celebrating graduation"
-            layout="fill"
-            objectFit="cover"
-            className="absolute inset-0"
+            fill
+            className="absolute inset-0 object-cover"
             data-ai-hint="students graduation"
           />
           <div className="container text-center relative z-20">
