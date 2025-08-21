@@ -62,8 +62,7 @@ import {
 } from '@/components/ui/form';
 import { useAuth } from '@/hooks/use-auth';
 import {
-  getApplication,
-  getApplications,
+  getApplicationsWithDetails,
   addApplication,
   updateApplication,
   deleteApplication,
@@ -99,7 +98,7 @@ const addItemSchema = z.object({
   category: z.enum(['Application', 'Standardized Test', 'Personal']),
 });
 
-function ApplicationRow({ application }: { application: Application }) {
+function ApplicationRow({ application, onUpdate }: { application: Application; onUpdate: (app: Application) => void; }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [tasks, setTasks] = useState(application.tasks || []);
   const [notes, setNotes] = useState(application.notes || '');
@@ -110,6 +109,7 @@ function ApplicationRow({ application }: { application: Application }) {
     if (!user) return;
     try {
       await updateApplication(user.uid, application.id, { notes: newNotes });
+      onUpdate({ ...application, notes: newNotes });
       toast({ title: 'Notes saved!', duration: 2000 });
     } catch (error) {
       console.error('Failed to save notes:', error);
@@ -124,6 +124,7 @@ function ApplicationRow({ application }: { application: Application }) {
 
     try {
       await updateApplication(user.uid, application.id, { tasks: optimisticTasks });
+       onUpdate({ ...application, tasks: optimisticTasks });
     } catch (error) {
       console.error("Failed to update task:", error);
       setTasks(tasks); // Revert
@@ -144,6 +145,7 @@ function ApplicationRow({ application }: { application: Application }) {
 
       try {
         await updateApplication(user.uid, application.id, { tasks: updatedTasks });
+        onUpdate({ ...application, tasks: updatedTasks });
       } catch (error) {
         console.error("Failed to add task:", error);
         setTasks(tasks); // Revert
@@ -240,14 +242,18 @@ export default function DashboardPage() {
     if (user) {
       const fetchApps = async () => {
         setIsLoading(true);
-        const userApps = await getApplications(user.uid);
-        const appsWithDetails = await Promise.all(userApps.map(app => getApplication(user.uid, app.id)));
-        setApplications(appsWithDetails.filter((app): app is Application => app !== null));
+        const userApps = await getApplicationsWithDetails(user.uid);
+        setApplications(userApps);
         setIsLoading(false);
       };
       fetchApps();
     }
   }, [user]);
+
+  const handleUpdateApplication = (updatedApp: Application) => {
+    setApplications(prev => prev.map(app => app.id === updatedApp.id ? updatedApp : app));
+  };
+
 
   const handleAddApplication = async (values: z.infer<typeof addItemSchema>) => {
     if (!user) return;
@@ -263,10 +269,8 @@ export default function DashboardPage() {
 
     try {
       const newAppId = await addApplication(user.uid, newAppData);
-      const newApp = await getApplication(user.uid, newAppId);
-      if (newApp) {
-          setApplications(prev => [...prev, newApp].sort((a,b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime()));
-      }
+      const newApp: Application = { id: newAppId, ...newAppData };
+      setApplications(prev => [...prev, newApp].sort((a,b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime()));
       
       await addDeadline(user.uid, {
         name: `${values.name}`,
@@ -476,6 +480,7 @@ export default function DashboardPage() {
                   <ApplicationRow
                     key={app.id}
                     application={app}
+                    onUpdate={handleUpdateApplication}
                   />
                 ))}
               </TableBody>
