@@ -11,6 +11,7 @@ import {
   writeBatch,
   getDoc,
   collectionGroup,
+  where,
 } from 'firebase/firestore';
 
 export interface Task {
@@ -49,31 +50,7 @@ export const getApplicationsWithDetails = async (userId: string): Promise<Applic
     if (appIds.length === 0) {
         return [];
     }
-
-    // 2. Fetch all tasks for all applications in a single query
-    const tasksQuery = query(collectionGroup(db, 'tasks'), where('__name__', '>', `users/${userId}/applications/`), where('__name__', '<', `users/${userId}/applications/z`));
-    const tasksSnapshot = await getDocs(tasksQuery);
     
-    tasksSnapshot.forEach(taskDoc => {
-        const pathSegments = taskDoc.ref.path.split('/');
-        const appId = pathSegments[3]; // expecting path like users/{uid}/applications/{appId}/tasks/{taskId}
-        if (applicationsById[appId]) {
-            applicationsById[appId].tasks?.push({ id: taskDoc.id, ...taskDoc.data() } as Task);
-        }
-    });
-
-    // 3. Fetch all notes for all applications in a single query
-    const notesQuery = query(collectionGroup(db, 'notes'), where('__name__', '>', `users/${userId}/applications/`), where('__name__', '<', `users/${userId}/applications/z`));
-    const notesSnapshot = await getDocs(notesQuery);
-
-    notesSnapshot.forEach(noteDoc => {
-        const pathSegments = noteDoc.ref.path.split('/');
-        const appId = pathSegments[3]; // expecting path like users/{uid}/applications/{appId}/notes/{noteId}
-        if (applicationsById[appId]) {
-            applicationsById[appId].notes = noteDoc.data().text || '';
-        }
-    });
-
     const allApplications = Object.values(applicationsById);
     return allApplications.sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
 };
